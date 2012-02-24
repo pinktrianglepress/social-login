@@ -1,0 +1,280 @@
+<?php
+/**
+ * @package   	OneAll Social Login Widget
+ * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
+ * @license   	GNU/GPL 2 or later
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,USA.
+ *
+ * The "GNU General Public License" (GPL) is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ */
+
+/**
+ * @file
+ * Adds the OneAll Social Login widget at the locations chosen by the administrator
+ */
+
+
+/**
+ * Add the javascript library
+ */
+function oneall_social_login_widget_add_js_library($subdomain, $https_enabled = FALSE) {
+  drupal_add_js(($https_enabled ? 'https' : 'http') . '://' . $subdomain . '.api.oneall.com/socialize/library.js', 'external');
+}
+
+/**
+ * Add the social network buttons buttons
+ */
+function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $providers, $containerid, $token = NULL) {
+
+  //Check if module exists
+  if (!module_exists('oneall_social_login_core')) {
+    drupal_set_message(t('The OneAll Social LoginCore module is missing'), 'error');
+    watchdog('oneall_social_login_widget', 'The OneAll Social LoginCore module is missing', WATCHDOG_ERROR);
+    return;
+  }
+
+  //Build the callback uri
+  $callback_uri = url('oneall_social_login/callback', array(
+    'absolute' => TRUE
+  ));
+
+  if (!empty($containerid)) {
+
+    //Check if website is run through https
+    $https_enabled = oneall_social_login_widget_is_ssl();
+
+    //Add social library
+    oneall_social_login_widget_add_js_library($subdomain, $https_enabled);
+
+    //Build Javascript
+    $js = "oneall.api.plugins." . $plugin_type . ".build(\"" . $containerid . "\", {
+						'providers' :  ['" . implode("','", $providers) . "'],
+						'callback_uri': '" . $callback_uri . "',
+						'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
+						'user_token': '" . (!empty($token) ? $token : '') . "',
+						'css_theme_uri' : '" . (($https_enabled ? 'https://secure.' : ' http://public.') . 'oneallcdn.com/css/api/socialize/themes/drupal/default.css') . "'
+					 }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal / v1.0 -->";
+
+    //Add login buttons
+    drupal_add_js($js, array(
+      'type' => 'inline',
+      'scope' => 'footer'
+    ));
+  }
+}
+
+/**
+ * Hook into login/registration form
+ */
+function oneall_social_login_widget_form_alter(&$form, &$form_state) {
+  if (is_array($form)) {
+    //Hook into registration page
+    if (isset($form ['#user_category']) AND $form ['#user_category'] == 'register') {
+      oneall_social_login_widget_show_providers($form, $form_state, 'registration_page');
+    }
+    //Hook into login page
+    elseif (isset($form ['#form_id']) AND $form ['#form_id'] == 'user_login') {
+      oneall_social_login_widget_show_providers($form, $form_state, 'login_page');
+    }
+    //Hook into used edit profile page
+    elseif (isset($form ['#form_id']) AND $form ['#form_id'] == 'user_profile_form') {
+      oneall_social_login_widget_show_providers($form, $form_state, 'edit_profile_page');
+    }
+  }
+}
+
+/**
+ * Hook into small login form
+ */
+function oneall_social_login_widget_form_user_login_block_alter(&$form, &$form_state) {
+  oneall_social_login_widget_show_providers($form, $form_state, 'side_pannel');
+}
+
+
+/**
+ * Generic function called to display the social providers
+ */
+function oneall_social_login_widget_show_providers(&$form, &$form_state, $target) {
+  //Read Settings
+  $settings = oneall_social_login_widget_get_settings();
+
+  //Enabled?
+  $widget_enabled = FALSE;
+
+  //Show in fieldset?
+  $widget_in_fieldset = FALSE;
+
+  //Unique token
+  $token = '';
+
+  //Where are the buttons shown?
+  switch ($target) {
+    //Side Pannel
+    case 'side_pannel':
+    //Type of plugin
+      $plugin_type = 'social_login';
+
+      //Don't show if disabled by admin
+      if (empty($settings ['side_pannel_icons']) OR $settings ['side_pannel_icons'] <> 'disable') {
+        $widget_enabled = TRUE;
+        $title = (!empty($settings ['side_pannel_caption']) ? $settings ['side_pannel_caption'] : '');
+        $position = ($settings ['side_pannel_icons'] == 'below' ? 100 : -100);
+      }
+      break;
+
+    //Registration Page
+    case 'registration_page':
+    //Type of plugin
+      $plugin_type = 'social_login';
+
+      //Don't show if there is already a session
+      if (empty($_SESSION ['oneall_social_login_session_open'])) {
+        //Don't show if disabled by admin
+        if (empty($settings ['registration_page_icons']) OR $settings ['registration_page_icons'] <> 'disable') {
+          $widget_enabled = TRUE;
+          $title = (!empty($settings ['registration_page_caption']) ? $settings ['registration_page_caption'] : '');
+          $position = ($settings ['registration_page_icons'] == 'below' ? 100 : -100);
+        }
+      }
+      break;
+
+    //Login Page
+    case 'login_page':
+    //Type of plugin
+      $plugin_type = 'social_login';
+
+      //Don't show if there is already a session
+      if (empty($_SESSION ['oneall_social_login_session_open'])) {
+        if (empty($settings ['login_page_icons']) OR $settings ['login_page_icons'] <> 'disable') {
+          $widget_enabled = TRUE;
+          $title = (!empty($settings ['login_page_caption']) ? $settings ['login_page_caption'] : '');
+          $position = ($settings ['login_page_icons'] == 'above' ? -100 : 100);
+        }
+      }
+      break;
+
+    //Edit Profile Page
+    case 'edit_profile_page':
+      if (empty($settings ['profile_page_icons']) OR $settings ['profile_page_icons'] <> 'disable') {
+        //Needed to retrieve his token
+        global $user;
+
+        //Unique token
+        $token = oneall_social_login_core_get_user_token_for_uid($user ->uid);
+
+        //Type of plugin
+        $plugin_type = 'social_link';
+
+        //Enable Widget
+        $widget_enabled = TRUE;
+
+        //Show in fieldset
+        $widget_in_fieldset = TRUE;
+
+        //Title
+        $title = (!empty($settings ['profile_page_caption']) ? $settings ['profile_page_caption'] : '');
+
+        //Display on top
+        $position = ($settings ['profile_page_icons'] == 'above' ? -100 : 100);
+      }
+      break;
+
+    //Unkown
+    default:
+    //Type of plugin
+      $plugin_type = 'social_login';
+
+      //Widget is enables
+      $widget_enabled = TRUE;
+
+      //Default title
+      $title = t('Login with');
+
+      //Display on botton
+      $position = 100;
+      break;
+  }
+
+  //Enabled
+  if ($widget_enabled === TRUE) {
+    //Container to add the buttons to
+    $containerid = 'oneall_social_login_provider_' . rand(99999, 9999999);
+
+    //Add javascript to display the plugin
+    oneall_social_login_widget_add_js_plugin($plugin_type, $settings ['api_subdomain'], $settings ['enabled_providers'], $containerid, $token);
+
+    //Show in fieldset
+    if ($widget_in_fieldset) {
+      $form ['oneall_social_login_' . $containerid] = array(
+        '#type' => 'fieldset',
+        '#title' => $title,
+        '#weight' => $position
+      );
+      $form ['oneall_social_login_' . $containerid] ['inner_block'] = array(
+        '#prefix' => '<div style="margin:20px 0 10px 0"><label>' . $title . '</label><div id="' . $containerid . '">',
+        '#suffix' => '</div></div>'
+      );
+    }
+    else {
+      $form ['oneall_social_login_' . $containerid] = array(
+        '#prefix' => '<div style="margin:20px 0 10px 0"><label>' . $title . '</label><div id="' . $containerid . '">',
+        '#suffix' => '</div></div>',
+        '#weight' => $position
+      );
+    }
+  }
+}
+
+/**
+ * Check if the current page has been opened through https
+ */
+function oneall_social_login_widget_is_ssl() {
+  if (isset($_SERVER ['HTTPS'])) {
+    if (drupal_strtolower($_SERVER ['HTTPS']) == 'on' OR $_SERVER ['HTTPS'] == '1') {
+      return TRUE;
+    }
+  }
+  elseif (isset($_SERVER ['SERVER_PORT'])) {
+    if ($_SERVER ['SERVER_PORT'] == '443') {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Returns the settings
+ */
+function oneall_social_login_widget_get_settings() {
+
+  //Container
+  $settings = array();
+  $settings ['enabled_providers'] = array();
+
+  //Read settings
+  $results = db_query("SELECT setting, value FROM {oneall_social_login_settings}");
+  foreach ($results as $result) {
+    $settings [$result ->setting] = $result ->value;
+    if (drupal_substr($result ->setting, 0, 8) == 'provider' AND !empty($result ->value)) {
+      $settings ['enabled_providers'] [] = drupal_substr($result ->setting, 9, drupal_strlen($result ->setting));
+    }
+  }
+
+  //Done
+  return $settings;
+}

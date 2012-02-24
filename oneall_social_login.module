@@ -1,0 +1,68 @@
+<?php
+/**
+ * @package   	OneAll Social Login Module
+ * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
+ * @license   	GNU/GPL 2 or later
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,USA.
+ *
+ * The "GNU General Public License" (GPL) is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ *
+ */
+
+/**
+ * @file
+ * Adds the link to the module to the administration area
+ */
+
+/**
+ * Link to admin/config/people/oneall_social_login
+ */
+function oneall_social_login_menu() {
+
+  //Container
+  $items = array();
+
+  //Link to administration page
+  $items ['admin/config/people/oneall_social_login'] = array(
+    'title' => 'Social Login',
+    'description' => 'Setup OneAll Social Login and enable the Social Networks of your choice',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'oneall_social_login_admin_settings'
+    ),
+    'access arguments' => array(
+      'access administration pages'
+    ),
+    'file' => 'oneall_social_login.admin.inc',
+  );
+
+  //Done
+  return $items;
+}
+
+/**
+ * Link to admin/help/oneall_social_login
+ */
+function oneall_social_login_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#oneall_social_login":
+      return t('We are devoted to creating a positive experience for our customers. Feel free to <a href="@oneall_support" target="_blank">contact us</a> if you have any questions and/or feedback.', array(
+        '@oneall_support' => 'http://www.oneall.com/company/contact-us/'
+      ));
+      break;
+  }
+}
