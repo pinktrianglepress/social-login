@@ -393,7 +393,7 @@ function oneall_social_login_admin_ajax_check_api_connection_settings($form, &$f
       else {
         switch ($result ['http_code']) {
           case '401':
-            $error_message = t('The API credentials are wrong! ');
+            $error_message = t('The API credentials are wrong!');
             break;
 
           case '404':
@@ -414,10 +414,10 @@ function oneall_social_login_admin_ajax_check_api_connection_settings($form, &$f
 
   // Error.
   if (!empty($success_message)) {
-    drupal_set_message($success_message, 'status oneall_social_login');
+    drupal_set_message(check_plain(($success_message), 'status oneall_social_login');
   }
   else {
-    drupal_set_message($error_message, 'error oneall_social_login');
+    drupal_set_message(check_plain($error_message), 'error oneall_social_login');
   }
 
   // Done.

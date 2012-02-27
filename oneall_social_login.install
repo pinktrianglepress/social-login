@@ -138,7 +138,6 @@ function oneall_social_login_install() {
   }
   catch (Exception $e) {
     $db_transaction->rollback();
-    drupal_set_message('Exception raised: ' . $e, 'error');
   }
 }
 
