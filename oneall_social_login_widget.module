@@ -1,11 +1,5 @@
 <?php
 /**
- * @file
- * Adds the OneAll Social Login widget at the locations
- * chosen by the administrator
- */
-
-/**
  * @package   	OneAll Social Login Widget
  * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
  * @license   	GNU/GPL 2 or later
@@ -29,6 +23,11 @@
  *
  */
 
+/**
+ * @file
+ * Adds the OneAll Social Login widget at the locations chosen by the administrator
+ */
+
 
 /**
  * Add the javascript library
@@ -42,25 +41,27 @@ function oneall_social_login_widget_add_js_library($subdomain, $https_enabled = 
  */
 function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $providers, $containerid, $token = NULL) {
 
-  // Check if module exists.
+  //Check if module exists
   if (!module_exists('oneall_social_login_core')) {
     drupal_set_message(t('The OneAll Social LoginCore module is missing'), 'error');
     watchdog('oneall_social_login_widget', 'The OneAll Social LoginCore module is missing', WATCHDOG_ERROR);
     return;
   }
 
-  // Build the callback uri.
-  $callback_uri = url('oneall_social_login/callback', array('absolute' => TRUE));
+  //Build the callback uri
+  $callback_uri = url('oneall_social_login/callback', array(
+    'absolute' => TRUE
+  ));
 
   if (!empty($containerid)) {
 
-    // Check if website is run through https.
+    //Check if website is run through https
     $https_enabled = oneall_social_login_widget_is_ssl();
 
-    // Add social library.
+    //Add social library
     oneall_social_login_widget_add_js_library($subdomain, $https_enabled);
 
-    // Build Javascript.
+    //Build Javascript
     $js = "oneall.api.plugins." . $plugin_type . ".build(\"" . $containerid . "\", {
 						'providers' :  ['" . implode("','", $providers) . "'],
 						'callback_uri': '" . $callback_uri . "',
@@ -69,8 +70,11 @@ function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $pro
 						'css_theme_uri' : '" . (($https_enabled ? 'https://secure.' : ' http://public.') . 'oneallcdn.com/css/api/socialize/themes/drupal/default.css') . "'
 					 }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal / v1.0 -->";
 
-    // Add login buttons.
-    drupal_add_js($js, array('type' => 'inline', 'scope' => 'footer'));
+    //Add login buttons
+    drupal_add_js($js, array(
+      'type' => 'inline',
+      'scope' => 'footer'
+    ));
   }
 }
 
@@ -78,24 +82,19 @@ function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $pro
  * Hook into login/registration form
  */
 function oneall_social_login_widget_form_alter(&$form, &$form_state) {
-
-  switch ($form ['#form_id']) {
-    // Hook into login page.
-    case 'user_login':
+  if (is_array($form)) {
+    //Hook into registration page
+    if (isset($form ['#user_category']) AND $form ['#user_category'] == 'register') {
+      oneall_social_login_widget_show_providers($form, $form_state, 'registration_page');
+    }
+    //Hook into login page
+    elseif (isset($form ['#form_id']) AND $form ['#form_id'] == 'user_login') {
       oneall_social_login_widget_show_providers($form, $form_state, 'login_page');
-      break;
-
-    // Hook into registration page.
-    case 'user_profile_form':
+    }
+    //Hook into used edit profile page
+    elseif (isset($form ['#form_id']) AND $form ['#form_id'] == 'user_profile_form') {
       oneall_social_login_widget_show_providers($form, $form_state, 'edit_profile_page');
-      break;
-
-    // Hook into registration page.
-    default:
-      if (isset($form ['#user_category']) AND $form ['#user_category'] == 'register') {
-        oneall_social_login_widget_show_providers($form, $form_state, 'registration_page');
-      }
-      break;
+    }
   }
 }
 
@@ -103,7 +102,7 @@ function oneall_social_login_widget_form_alter(&$form, &$form_state) {
  * Hook into small login form
  */
 function oneall_social_login_widget_form_user_login_block_alter(&$form, &$form_state) {
-  oneall_social_login_widget_show_providers($form, $form_state, 'side_panel');
+  oneall_social_login_widget_show_providers($form, $form_state, 'side_pannel');
 }
 
 
@@ -111,40 +110,41 @@ function oneall_social_login_widget_form_user_login_block_alter(&$form, &$form_s
  * Generic function called to display the social providers
  */
 function oneall_social_login_widget_show_providers(&$form, &$form_state, $target) {
-
-  // Read Settings.
+  //Read Settings
   $settings = oneall_social_login_widget_get_settings();
 
-  // Enabled?
+  //Enabled?
   $widget_enabled = FALSE;
 
-  // Show in fieldset?
+  //Show in fieldset?
   $widget_in_fieldset = FALSE;
 
-  // Unique token.
+  //Unique token
   $token = '';
 
-  // Where are the buttons shown?
+  //Where are the buttons shown?
   switch ($target) {
-    // Side Panel.
-    case 'side_panel':
+    //Side Pannel
+    case 'side_pannel':
+    //Type of plugin
       $plugin_type = 'social_login';
 
-      // Don't show if disabled by admin.
-      if (empty($settings ['side_panel_icons']) OR $settings ['side_panel_icons'] <> 'disable') {
+      //Don't show if disabled by admin
+      if (empty($settings ['side_pannel_icons']) OR $settings ['side_pannel_icons'] <> 'disable') {
         $widget_enabled = TRUE;
-        $title = (!empty($settings ['side_panel_caption']) ? $settings ['side_panel_caption'] : '');
-        $position = ($settings ['side_panel_icons'] == 'below' ? 100 : -100);
+        $title = (!empty($settings ['side_pannel_caption']) ? $settings ['side_pannel_caption'] : '');
+        $position = ($settings ['side_pannel_icons'] == 'below' ? 100 : -100);
       }
       break;
 
-    // Registration Page.
+    //Registration Page
     case 'registration_page':
+    //Type of plugin
       $plugin_type = 'social_login';
 
-      // Don't show if there is already a session.
+      //Don't show if there is already a session
       if (empty($_SESSION ['oneall_social_login_session_open'])) {
-        // Don't show if disabled by admin.
+        //Don't show if disabled by admin
         if (empty($settings ['registration_page_icons']) OR $settings ['registration_page_icons'] <> 'disable') {
           $widget_enabled = TRUE;
           $title = (!empty($settings ['registration_page_caption']) ? $settings ['registration_page_caption'] : '');
@@ -153,11 +153,12 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
       }
       break;
 
-    // Login Page.
+    //Login Page
     case 'login_page':
+    //Type of plugin
       $plugin_type = 'social_login';
 
-      // Don't show if there is already a session.
+      //Don't show if there is already a session
       if (empty($_SESSION ['oneall_social_login_session_open'])) {
         if (empty($settings ['login_page_icons']) OR $settings ['login_page_icons'] <> 'disable') {
           $widget_enabled = TRUE;
@@ -167,72 +168,73 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
       }
       break;
 
-    // Edit Profile Page.
+    //Edit Profile Page
     case 'edit_profile_page':
       if (empty($settings ['profile_page_icons']) OR $settings ['profile_page_icons'] <> 'disable') {
-        // Needed to retrieve his token.
+        //Needed to retrieve his token
         global $user;
 
-        // Unique token.
-        $token = oneall_social_login_core_get_user_token_for_uid($user->uid);
+        //Unique token
+        $token = oneall_social_login_core_get_user_token_for_uid($user ->uid);
 
-        // Type of plugin.
+        //Type of plugin
         $plugin_type = 'social_link';
 
-        // Enable Widget.
+        //Enable Widget
         $widget_enabled = TRUE;
 
-        // Show in fieldset.
+        //Show in fieldset
         $widget_in_fieldset = TRUE;
 
-        // Title.
+        //Title
         $title = (!empty($settings ['profile_page_caption']) ? $settings ['profile_page_caption'] : '');
 
-        // Display on top.
+        //Display on top
         $position = ($settings ['profile_page_icons'] == 'above' ? -100 : 100);
       }
       break;
 
-    // Unkown.
+    //Unkown
     default:
+    //Type of plugin
       $plugin_type = 'social_login';
 
-      // Widget is enables.
+      //Widget is enables
       $widget_enabled = TRUE;
 
-      // Default title.
+      //Default title
       $title = t('Login with');
 
-      // Display on botton.
+      //Display on botton
       $position = 100;
       break;
   }
 
-  // Enabled.
+  //Enabled
   if ($widget_enabled === TRUE) {
-    // Container to add the buttons to.
+    //Container to add the buttons to
     $containerid = 'oneall_social_login_provider_' . rand(99999, 9999999);
 
-    // Add javascript to display the plugin.
+    //Add javascript to display the plugin
     oneall_social_login_widget_add_js_plugin($plugin_type, $settings ['api_subdomain'], $settings ['enabled_providers'], $containerid, $token);
 
-    // Show in fieldset.
+    //Show in fieldset
     if ($widget_in_fieldset) {
       $form ['oneall_social_login_' . $containerid] = array(
         '#type' => 'fieldset',
         '#title' => $title,
-        '#weight' => $position,
+        '#weight' => $position
       );
       $form ['oneall_social_login_' . $containerid] ['inner_block'] = array(
-        '#prefix' => '<div style="margin:20px 0 10px 0"><div id="' . $containerid . '">',
-        '#suffix' => '</div></div>',
+        '#prefix' => '<div style="margin:20px 0 10px 0"><label>' . $title . '</label><div id="' . $containerid . '">',
+        '#suffix' => '</div></div>'
       );
     }
     else {
       $form ['oneall_social_login_' . $containerid] = array(
         '#prefix' => '<div style="margin:20px 0 10px 0"><label>' . $title . '</label><div id="' . $containerid . '">',
         '#suffix' => '</div></div>',
-        '#weight' => $position,
+        '#weight' => $position
       );
     }
   }
@@ -260,19 +262,19 @@ function oneall_social_login_widget_is_ssl() {
  */
 function oneall_social_login_widget_get_settings() {
 
-  // Container.
+  //Container
   $settings = array();
   $settings ['enabled_providers'] = array();
 
-  // Read settings.
+  //Read settings
   $results = db_query("SELECT setting, value FROM {oneall_social_login_settings}");
   foreach ($results as $result) {
-    $settings [$result->setting] = $result->value;
-    if (drupal_substr($result->setting, 0, 8) == 'provider' AND !empty($result->value)) {
-      $settings ['enabled_providers'] [] = drupal_substr($result->setting, 9, drupal_strlen($result->setting));
+    $settings [$result ->setting] = $result ->value;
+    if (drupal_substr($result ->setting, 0, 8) == 'provider' AND !empty($result ->value)) {
+      $settings ['enabled_providers'] [] = drupal_substr($result ->setting, 9, drupal_strlen($result ->setting));
     }
   }
 
-  // Done.
+  //Done
   return $settings;
 }
