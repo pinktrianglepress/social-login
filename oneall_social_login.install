@@ -29,47 +29,102 @@
  * On UnInstall: removes the previously created tables
  */
 
+
 /**
- * Install: create the tables
+ * Database schema
  */
-function oneall_social_login_install() {
+function oneall_social_login_schema() {
 
-  db_query("CREATE TABLE IF NOT EXISTS `oneall_social_login_identities` (
-   `slid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-   `aid` int(10) unsigned NOT NULL DEFAULT '0',
-   `identity_token` char(40) NOT NULL,
-   `provider_name` tinytext NOT NULL,
-   PRIMARY KEY (`slid`),
-   KEY `identity_token` (`identity_token`),
-   KEY `aid` (`aid`)
-   ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;");
+  // Used to link social network profiles to authmap entries
+  $schema['oneall_social_login_identities'] = array(
+  	'description' => t('Used to link social network profiles to authmap entries.'),
+     'fields' => array(
+     	'oasliid' => array(
+     		'description' => t('The primary key of this table.'),
+        'type' => 'serial',
+        'length' => 10,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+     	),
+     	'aid' => array(
+     		'description' => t('Foreign key to link entries of this table to entries in the authmap table.'),
+        'type' => 'int',
+        'length' => 10,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+     	),
+     	'identity_token' => array(
+     		'description' => t('Unique identity_token for a social network profile, returned by the OneAll API.'),
+        'type' => 'varchar',
+        'length' => 40,
+        'not null' => TRUE,
+     	),
+     	'provider_name' => array(
+     		'description' => t('Social network provider (Facebook, Twitter ...) of this identity.'),
+        'type' => 'tinytext',
+        'not null' => TRUE,
+     	),
+     ),
+     'indexes' => array(
+     	'identity_token' => array ('identity_token'),
+     	'aid' => array ('aid')
+     ),
+     'foreign keys' => array(
+   		 'aid' => array(
+      	'table' => 'authmap',
+      	'columns' => array('aid' => 'aid')
+     )),
+     'primary key' => array('oasliid')
+     );
 
-  db_query("CREATE TABLE IF NOT EXISTS `oneall_social_login_settings` (
-  `slsid` int(10) NOT NULL AUTO_INCREMENT,
-  `setting` tinytext NOT NULL,
-  `value` tinytext NOT NULL,
-  PRIMARY KEY (`slsid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2206 ;
-  
-  
-  
-  CREATE TABLE IF NOT EXISTS `oneall_social_login_settings` (
-   `slid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-   `aid` int(10) unsigned NOT NULL DEFAULT '0',
-   `meta_key` varchar(255) DEFAULT NULL,
-   `meta_value` longtext,
-   PRIMARY KEY (`slid`),
-   KEY `aid` (`aid`),
-   KEY `meta_key` (`meta_key`)
-   ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;");
+  // Used to store module settings
+  $schema['oneall_social_login_settings'] = array(
+  	'description' => t('Used to store module settings.'),
+     'fields' => array(
+     	'oaslsid' => array(
+     		'description' => t('The primary key of this table.'),
+        'type' => 'serial',
+        'length' => 10,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+     	),
+     	'setting' => array(
+     		'description' => t('The name of the setting.'),
+        'type' => 'tinytext',
+        'not null' => TRUE,
+     	),
+     	'value' => array(
+     		'description' => t('The value of this setting.'),
+        'type' => 'tinytext',
+        'not null' => TRUE,
+     	),
+     ),
+     'indexes' => array(
+     	'setting' => array ('setting')
+     ),
+     'primary key' => array('oaslsid')
+     );
+
+  return $schema;
 }
 
 /**
- * UnInstall: remove the created tables
- *
+ * Install: create the required tables
  */
-function oneall_social_login_uninstall() {
+function mymodule_install() {
+  drupal_install_schema('oneall_social_login_identities');
+  drupal_install_schema('oneall_social_login_settings');
+}
+
+/**
+ * UnInstall: remove the module tables and cleanup module entries added to authmap
+ */
+function mymodule_uninstall() {
+
+	// Drop tables
+  drupal_uninstall_schema('oneall_social_login_identities');
+	drupal_uninstall_schema('oneall_social_login_settings');
+
+	// Remove entries that module might have created
 	db_delete('authmap') ->condition('module', 'oneall_social_login') ->execute();
-  db_query('DROP TABLE IF EXISTS `oneall_social_login_identities`');
-  db_query('DROP TABLE IF EXISTS `oneall_social_login_users`');
 }
