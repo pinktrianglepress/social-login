@@ -1,17 +1,52 @@
 Module:  OneAll Social Login
-
 Authors: Claude Schlesser <cschlesser@oneall.com>
 
 Description
 ===========
 
-The OneAll Social Login Module allows your visitors to login and register with
-social networks.
+Professionally developed and free Drupal module that allows your users to 
+register and login to your Drupal website with their existing social network 
+account (Twitter, Facebook, LinkedIn, Google ...)
+
+Your existing users can furthermore link their regular account to one or more 
+social networks or identity providers and can then use these social network 
+accounts to login without having to remember another username/password 
+combination.
+
+SocialLogin helps increasing your user registration rate by simplifying the 
+registration process and provides permission-based social data retrieved from 
+the social network profiles.
+
+SocialLogin integrates with your existing registration system so you and your 
+users don't have to start from scratch.
+
+Social Login is maintained by OneAll, a technology company offering a set of 
+web-delivered tools and services for establishing and optimizing a site's 
+connection with social networks.
+
+Social network APIs are constantly changing and being updated. OneAll monitors 
+these changes and automatically updates APIs, so you can be sure Social Login 
+will always run smoothly and with the most up-to-date API calls.
+
+Visit us at:
+http://www.oneall.com
+
+The Social Login documentation is available at:
+http://docs.oneall.com/plugins/guide/
+
+We are devoted to creating a positive experience for our customers and always 
+try to go above and beyond your expectations. Do not hesitate to contact us 
+for questions about the Social Login Module, to give us your feedback or if you 
+need any help with the integration of the extension in your Drupal Website.
+
+Our team answers your questions at:
+http://www.oneall.com/company/contact-us/
 
 Supported Social Networks
 ===========
 
-OneAll Social Login for Drupal currently supports the following social networks and identity providers:
+OneAll Social Login for Drupal currently supports the following social 
+networks and identity providers:
 
 - Twitter
 - Facebook
@@ -26,22 +61,3 @@ OneAll Social Login for Drupal currently supports the following social networks 
 - StackExchange
 - Wordpress
 - Steam Community
-
-Installation and Configuration
-============
-
-Installation and Configuration
-
-Please follow these steps to install OneAll Social Login for Drupal:
-
-1. Download the module archive,
-2. Create a new directory "oneall_social_login" in the "modules" directory of your Drupal installation,
-3. Extract the files of downloaded archive into the created "oneall_social_login" directory,
-4. Login to your Drupal administration area,
-5. Open the "Modules" page, scroll down and enable all "ONEALL SOCIAL LOGIN" entries,
-6. Open the "Configuration" page, click on "Social Login" in the "PEOPLE" group,
-7. Enter your "API Settings", choose the Social Networks and save your configuration.
-
-NOTE: 
-If you do not have your "API Settings" yet, please signup for a new account here: https://app.oneall.com/signup/.
-You will obtain the "API Settings" after having created a new Site.

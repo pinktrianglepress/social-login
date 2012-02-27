@@ -1,5 +1,10 @@
 <?php
 /**
+ * @file
+ * Adds the link to the module to the administration area
+ */
+
+/**
  * @package   	OneAll Social Login Module
  * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
  * @license   	GNU/GPL 2 or later
@@ -24,33 +29,28 @@
  */
 
 /**
- * @file
- * Adds the link to the module to the administration area
- */
-
-/**
  * Link to admin/config/people/oneall_social_login
  */
 function oneall_social_login_menu() {
 
-  //Container
+  // Container.
   $items = array();
 
-  //Link to administration page
+  // Link to administration page.
   $items ['admin/config/people/oneall_social_login'] = array(
-    'title' => 'Social Login',
+    'title' => 'OneAll Social Login',
     'description' => 'Setup OneAll Social Login and enable the Social Networks of your choice',
     'page callback' => 'drupal_get_form',
     'page arguments' => array(
-      'oneall_social_login_admin_settings'
+      'oneall_social_login_admin_settings',
     ),
     'access arguments' => array(
-      'access administration pages'
+      'access administration pages',
     ),
     'file' => 'oneall_social_login.admin.inc',
   );
 
-  //Done
+  // Done.
   return $items;
 }
 
@@ -61,7 +61,7 @@ function oneall_social_login_help($path, $arg) {
   switch ($path) {
     case "admin/help#oneall_social_login":
       return t('We are devoted to creating a positive experience for our customers. Feel free to <a href="@oneall_support" target="_blank">contact us</a> if you have any questions and/or feedback.', array(
-        '@oneall_support' => 'http://www.oneall.com/company/contact-us/'
+        '@oneall_support' => 'http://www.oneall.com/company/contact-us/',
       ));
       break;
   }
