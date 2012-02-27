@@ -1,3 +1,7 @@
+div.messages.oneall_social_login{
+ margin: 5px 10px;
+}
+
 .oneall_social_login_provider {
  background-image: url("img/oneall_social_login.providers.png");
  text-indent: -9999px;
