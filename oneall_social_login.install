@@ -26,7 +26,6 @@
  *
  * The "GNU General Public License" (GPL) is available at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
  */
 
 /**
@@ -35,7 +34,7 @@
 function oneall_social_login_schema() {
 
   // Used to link social network profiles to authmap entries.
-  $schema ['oneall_social_login_identities'] = array(
+  $schema['oneall_social_login_identities'] = array(
     'description' => 'Used to link social network profiles to authmap entries.',
     'fields' => array(
       'oasliid' => array(
@@ -87,7 +86,7 @@ function oneall_social_login_schema() {
   );
 
   // Used to store module settings.
-  $schema ['oneall_social_login_settings'] = array(
+  $schema['oneall_social_login_settings'] = array(
     'description' => 'Used to store module settings.',
     'fields' => array(
       'oaslsid' => array(

@@ -26,7 +26,6 @@
  *
  * The "GNU General Public License" (GPL) is available at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
  */
 
 
@@ -62,7 +61,7 @@ function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $pro
 
     // Build Javascript.
     $js = "oneall.api.plugins." . $plugin_type . ".build(\"" . $containerid . "\", {
-						'providers' :  ['" . implode("','", $providers) . "'],
+						'providers' : ['" . implode("','", $providers) . "'],
 						'callback_uri': '" . $callback_uri . "',
 						'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
 						'user_token': '" . (!empty($token) ? $token : '') . "',
@@ -79,7 +78,7 @@ function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $pro
  */
 function oneall_social_login_widget_form_alter(&$form, &$form_state) {
 
-  switch ($form ['#form_id']) {
+  switch ($form['#form_id']) {
     // Hook into login page.
     case 'user_login':
       oneall_social_login_widget_show_providers($form, $form_state, 'login_page');
@@ -92,7 +91,7 @@ function oneall_social_login_widget_form_alter(&$form, &$form_state) {
 
     // Hook into registration page.
     default:
-      if (isset($form ['#user_category']) AND $form ['#user_category'] == 'register') {
+      if (isset($form['#user_category']) AND $form['#user_category'] == 'register') {
         oneall_social_login_widget_show_providers($form, $form_state, 'registration_page');
       }
       break;
@@ -131,10 +130,10 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
       $plugin_type = 'social_login';
 
       // Don't show if disabled by admin.
-      if (empty($settings ['side_panel_icons']) OR $settings ['side_panel_icons'] <> 'disable') {
+      if (empty($settings['side_panel_icons']) OR $settings['side_panel_icons'] <> 'disable') {
         $widget_enabled = TRUE;
-        $title = (!empty($settings ['side_panel_caption']) ? $settings ['side_panel_caption'] : '');
-        $position = ($settings ['side_panel_icons'] == 'below' ? 100 : -100);
+        $title = (!empty($settings['side_panel_caption']) ? $settings['side_panel_caption'] : '');
+        $position = ($settings['side_panel_icons'] == 'below' ? 100 : -100);
       }
       break;
 
@@ -143,12 +142,12 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
       $plugin_type = 'social_login';
 
       // Don't show if there is already a session.
-      if (empty($_SESSION ['oneall_social_login_session_open'])) {
+      if (empty($_SESSION['oneall_social_login_session_open'])) {
         // Don't show if disabled by admin.
-        if (empty($settings ['registration_page_icons']) OR $settings ['registration_page_icons'] <> 'disable') {
+        if (empty($settings['registration_page_icons']) OR $settings['registration_page_icons'] <> 'disable') {
           $widget_enabled = TRUE;
-          $title = (!empty($settings ['registration_page_caption']) ? $settings ['registration_page_caption'] : '');
-          $position = ($settings ['registration_page_icons'] == 'below' ? 100 : -100);
+          $title = (!empty($settings['registration_page_caption']) ? $settings['registration_page_caption'] : '');
+          $position = ($settings['registration_page_icons'] == 'below' ? 100 : -100);
         }
       }
       break;
@@ -158,18 +157,18 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
       $plugin_type = 'social_login';
 
       // Don't show if there is already a session.
-      if (empty($_SESSION ['oneall_social_login_session_open'])) {
-        if (empty($settings ['login_page_icons']) OR $settings ['login_page_icons'] <> 'disable') {
+      if (empty($_SESSION['oneall_social_login_session_open'])) {
+        if (empty($settings['login_page_icons']) OR $settings['login_page_icons'] <> 'disable') {
           $widget_enabled = TRUE;
-          $title = (!empty($settings ['login_page_caption']) ? $settings ['login_page_caption'] : '');
-          $position = ($settings ['login_page_icons'] == 'above' ? -100 : 100);
+          $title = (!empty($settings['login_page_caption']) ? $settings['login_page_caption'] : '');
+          $position = ($settings['login_page_icons'] == 'above' ? -100 : 100);
         }
       }
       break;
 
     // Edit Profile Page.
     case 'edit_profile_page':
-      if (empty($settings ['profile_page_icons']) OR $settings ['profile_page_icons'] <> 'disable') {
+      if (empty($settings['profile_page_icons']) OR $settings['profile_page_icons'] <> 'disable') {
         // Needed to retrieve his token.
         global $user;
 
@@ -186,10 +185,10 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
         $widget_in_fieldset = TRUE;
 
         // Title.
-        $title = (!empty($settings ['profile_page_caption']) ? $settings ['profile_page_caption'] : '');
+        $title = (!empty($settings['profile_page_caption']) ? $settings['profile_page_caption'] : '');
 
         // Display on top.
-        $position = ($settings ['profile_page_icons'] == 'above' ? -100 : 100);
+        $position = ($settings['profile_page_icons'] == 'above' ? -100 : 100);
       }
       break;
 
@@ -214,22 +213,22 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
     $containerid = 'oneall_social_login_provider_' . rand(99999, 9999999);
 
     // Add javascript to display the plugin.
-    oneall_social_login_widget_add_js_plugin($plugin_type, $settings ['api_subdomain'], $settings ['enabled_providers'], $containerid, $token);
+    oneall_social_login_widget_add_js_plugin($plugin_type, $settings['api_subdomain'], $settings['enabled_providers'], $containerid, $token);
 
     // Show in fieldset.
     if ($widget_in_fieldset) {
-      $form ['oneall_social_login_' . $containerid] = array(
+      $form['oneall_social_login_' . $containerid] = array(
         '#type' => 'fieldset',
         '#title' => $title,
         '#weight' => $position,
       );
-      $form ['oneall_social_login_' . $containerid] ['inner_block'] = array(
+      $form['oneall_social_login_' . $containerid]['inner_block'] = array(
         '#prefix' => '<div style="margin:20px 0 10px 0"><div id="' . $containerid . '">',
         '#suffix' => '</div></div>',
       );
     }
     else {
-      $form ['oneall_social_login_' . $containerid] = array(
+      $form['oneall_social_login_' . $containerid] = array(
         '#prefix' => '<div style="margin:20px 0 10px 0"><label>' . $title . '</label><div id="' . $containerid . '">',
         '#suffix' => '</div></div>',
         '#weight' => $position,
@@ -242,13 +241,13 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
  * Check if the current page has been opened through https
  */
 function oneall_social_login_widget_is_ssl() {
-  if (isset($_SERVER ['HTTPS'])) {
-    if (drupal_strtolower($_SERVER ['HTTPS']) == 'on' OR $_SERVER ['HTTPS'] == '1') {
+  if (isset($_SERVER['HTTPS'])) {
+    if (drupal_strtolower($_SERVER['HTTPS']) == 'on' OR $_SERVER['HTTPS'] == '1') {
       return TRUE;
     }
   }
-  elseif (isset($_SERVER ['SERVER_PORT'])) {
-    if ($_SERVER ['SERVER_PORT'] == '443') {
+  elseif (isset($_SERVER['SERVER_PORT'])) {
+    if ($_SERVER['SERVER_PORT'] == '443') {
       return TRUE;
     }
   }
@@ -262,14 +261,14 @@ function oneall_social_login_widget_get_settings() {
 
   // Container.
   $settings = array();
-  $settings ['enabled_providers'] = array();
+  $settings['enabled_providers'] = array();
 
   // Read settings.
   $results = db_query("SELECT setting, value FROM {oneall_social_login_settings}");
   foreach ($results as $result) {
-    $settings [$result->setting] = $result->value;
+    $settings[$result->setting] = $result->value;
     if (drupal_substr($result->setting, 0, 8) == 'provider' AND !empty($result->value)) {
-      $settings ['enabled_providers'] [] = drupal_substr($result->setting, 9, drupal_strlen($result->setting));
+      $settings['enabled_providers'][] = drupal_substr($result->setting, 9, drupal_strlen($result->setting));
     }
   }
 
