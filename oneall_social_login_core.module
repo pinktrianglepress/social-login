@@ -618,8 +618,10 @@ function oneall_social_login_core_get_settings() {
  */
 function oneall_social_login_core_preprocess_page(&$vars, $hook) {
   if (is_array($vars ['page']) AND isset($vars ['page']) AND isset($vars ['page'] ['footer'])) {
-    $vars ['page'] ['footer'] ['system_powered-by'] ['#markup'] .= '&nbsp; | &nbsp;'
-    . t('<a href="@link_social_login">Social Login</a> powered by <a href="@link_oneall">OneAll</a>',
-    array('@link_social_login' => 'http://www.oneall.com/' . 'services/single-sign-on/', '@link_oneall' => 'http://www.oneall.com'));
+	if (isset ($vars ['page'] ['footer'] ['system_powered-by']) AND isset ($vars ['page'] ['footer'] ['system_powered-by'] ['#markup'])){
+	    $vars ['page'] ['footer'] ['system_powered-by'] ['#markup'] .= '&nbsp; | &nbsp;'
+	    . t('<a href="@link_social_login">Social Login</a> powered by <a href="@link_oneall">OneAll</a>',
+	    array('@link_social_login' => 'http://www.oneall.com/' . 'services/single-sign-on/', '@link_oneall' => 'http://www.oneall.com'));
+	}
   }
 }
