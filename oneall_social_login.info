@@ -4,4 +4,3 @@ package = "OneAll Social Login"
 core = 7.x
 configure = admin/config/people/oneall_social_login
 dependencies[] = "oneall_social_login_core"
-dependencies[] = "oneall_social_login_widget"

@@ -2,42 +2,25 @@
 /**
  * @file
  * Adds the OneAll Social Login widget at the locations
- * chosen by the administrator
+ * chosen by the administrator.
  */
 
 /**
  * @package   	OneAll Social Login Widget
  * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
  * @license   	GNU/GPL 2 or later
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,USA.
- *
- * The "GNU General Public License" (GPL) is available at
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
 
 /**
- * Add the javascript library
+ * Add the javascript library.
  */
 function oneall_social_login_widget_add_js_library($subdomain, $https_enabled = FALSE) {
   drupal_add_js(($https_enabled ? 'https' : 'http') . '://' . $subdomain . '.api.oneall.com/socialize/library.js', 'external');
 }
 
 /**
- * Add the social network buttons buttons
+ * Add the social network buttons.
  */
 function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $providers, $containerid, $token = NULL) {
 
@@ -74,7 +57,7 @@ function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $pro
 }
 
 /**
- * Hook into login/registration form
+ * Hook into login/registration form.
  */
 function oneall_social_login_widget_form_alter(&$form, &$form_state) {
 
@@ -99,7 +82,7 @@ function oneall_social_login_widget_form_alter(&$form, &$form_state) {
 }
 
 /**
- * Hook into small login form
+ * Hook into small login form.
  */
 function oneall_social_login_widget_form_user_login_block_alter(&$form, &$form_state) {
   oneall_social_login_widget_show_providers($form, $form_state, 'side_panel');
@@ -107,7 +90,7 @@ function oneall_social_login_widget_form_user_login_block_alter(&$form, &$form_s
 
 
 /**
- * Generic function called to display the social providers
+ * Generic function called to display the social providers.
  */
 function oneall_social_login_widget_show_providers(&$form, &$form_state, $target) {
 
@@ -238,7 +221,7 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
 }
 
 /**
- * Check if the current page has been opened through https
+ * Check if the current page has been opened through https.
  */
 function oneall_social_login_widget_is_ssl() {
   if (isset($_SERVER['HTTPS'])) {
@@ -255,7 +238,7 @@ function oneall_social_login_widget_is_ssl() {
 }
 
 /**
- * Returns the settings
+ * Returns the settings.
  */
 function oneall_social_login_widget_get_settings() {
 

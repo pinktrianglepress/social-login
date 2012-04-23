@@ -77,3 +77,11 @@ div.messages.oneall_social_login {
 .oneall_social_login_provider.oneall_social_login_provider_steam {
   background-position: -816px -1px;
 }
+
+.oneall_social_login_provider.oneall_social_login_provider_windowslive {
+  background-position: -261px -1px;
+}
+
+.oneall_social_login_provider.oneall_social_login_provider_mailru {
+  background-position: -853px -1px;
+}
