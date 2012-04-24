@@ -239,8 +239,7 @@ function oneall_social_login_admin_settings($form, &$form_state) {
   );
 
   // Include the list of providers.
-  // Defines $oneall_social_login_available_providers.
-  require_once 'oneall_social_login.providers.php';
+  $oneall_social_login_available_providers = oneall_social_login_core_get_available_providers();
 
   // Add providers.
   foreach ($oneall_social_login_available_providers as $key => $provider_data) {

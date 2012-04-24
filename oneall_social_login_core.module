@@ -362,7 +362,9 @@ function oneall_social_login_core_user_login(&$edit, $account) {
  * Unlink an identity_token from an existing user account.
  */
 function oneall_social_login_core_unmap_identity_token($identity_token) {
-  db_delete('oneall_social_login_identities')->condition('identity_token', $identity_token)->execute();
+  db_delete('oneall_social_login_identities')
+  ->condition('identity_token', $identity_token)
+  ->execute();
 }
 
 
@@ -384,16 +386,23 @@ function oneall_social_login_core_map_identity_token_to_user_token($account, $id
            ->condition('authname', $user_token, '=')
            ->execute()
            ->fetchField();
+
     if (is_numeric($aid)) {
 
       // Remove duplicate identities.
-      db_delete('oneall_social_login_identities')->condition('aid', $aid)->condition('identity_token', $identity_token)->execute();
+      db_delete('oneall_social_login_identities')
+      ->condition('aid', $aid)
+      ->condition('identity_token', $identity_token)
+      ->execute();
 
       // Add identity.
-      db_insert('oneall_social_login_identities')->fields(array(
-       'aid' => $aid,
-       'identity_token' => $identity_token,
-       'provider_name' => $provider_name))->execute();
+      db_insert('oneall_social_login_identities')
+      ->fields(array(
+         'aid' => $aid,
+         'identity_token' => $identity_token,
+         'provider_name' => $provider_name,
+       ))
+      ->execute();
 
       return TRUE;
     }
@@ -606,4 +615,46 @@ function oneall_social_login_core_preprocess_page(&$vars, $hook) {
       array('@link_social_login' => 'http://www.oneall.com/' . 'services/single-sign-on/', '@link_oneall' => 'http://www.oneall.com'));
     }
   }
+}
+
+/**
+ * Retur the list of available providers.
+ */
+function oneall_social_login_core_get_available_providers() {
+
+  $available_providers = array(
+    'facebook' => array(
+      'name' => 'Facebook',
+    ), 'twitter' => array(
+      'name' => 'Twitter',
+    ), 'google' => array(
+      'name' => 'Google',
+    ), 'linkedin' => array(
+      'name' => 'LinkedIn',
+    ), 'yahoo' => array(
+      'name' => 'Yahoo',
+    ), 'openid' => array(
+      'name' => 'OpenID',
+    ), 'wordpress' => array(
+      'name' => 'Wordpress.com',
+    ), 'hyves' => array(
+      'name' => 'Hyves',
+    ), 'paypal' => array(
+      'name' => 'PayPal',
+    ), 'livejournal' => array(
+      'name' => 'LiveJournal',
+    ), 'vkontakte' => array(
+      'name' => 'VKontakte',
+    ), 'stackexchange' => array(
+      'name' => 'StackExchange',
+    ), 'steam' => array(
+      'name' => 'Steam Community',
+    ), 'mailru' => array(
+      'name' => 'Mail.ru',
+    ), 'windowslive' => array(
+      'name' => 'Windows Live',
+    ),
+  );
+
+  return $available_providers;
 }
