@@ -5,9 +5,8 @@
  */
 
 /**
- * @package   	OneAll Social Login Providers
- * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
- * @license   	GNU/GPL 2 or later
+ * @package OneAll Social Login Providers
+ * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
  */
 
 /**

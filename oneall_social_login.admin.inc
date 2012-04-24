@@ -6,9 +6,8 @@
  */
 
 /**
- * @package   	OneAll Social Login Admin
- * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
- * @license   	GNU/GPL 2 or later
+ * @package OneAll Social Login Admin
+ * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
  */
 
 /**
@@ -22,9 +21,6 @@ function oneall_social_login_admin_settings($form, &$form_state) {
     watchdog('oneall_social_login_widget', 'The OneAll Social LoginCore module is missing', WATCHDOG_ERROR);
     return;
   }
-
-  // Include the list of providers.
-  require_once 'oneall_social_login.providers.php';
 
   // Used to display the provider icons.
   drupal_add_css(drupal_get_path('module', 'oneall_social_login') . '/oneall_social_login.admin.css');
@@ -242,6 +238,10 @@ function oneall_social_login_admin_settings($form, &$form_state) {
     '#title' => t('Enable the social networks/identity providers of your choice'),
   );
 
+  // Include the list of providers.
+  // Defines $oneall_social_login_available_providers.
+  require_once 'oneall_social_login.providers.php';
+
   // Add providers.
   foreach ($oneall_social_login_available_providers as $key => $provider_data) {
     $form['oneall_social_login_providers']['oneall_social_login_icon_' . $key] = array(
@@ -282,8 +282,6 @@ function oneall_social_login_admin_settings($form, &$form_state) {
 
   // Handled by oneall_social_login_admin_settings_submit.
   $form['#submit'][] = 'oneall_social_login_admin_settings_submit';
-
-  // Done.
   return system_settings_form($form);
 }
 
@@ -319,8 +317,6 @@ function oneall_social_login_admin_ajax_api_connection_autodetect($form, &$form_
     drupal_set_message(t('Sorry, but your firewall blocks outoing requests on port 443. Please open port 443 for outgoing requests.'),
     'error oneall_social_login');
   }
-
-  // Done.
   return $form['oneall_social_login_api_connection'];
 }
 
@@ -343,7 +339,7 @@ function oneall_social_login_admin_ajax_check_api_connection_settings($form, &$f
   $success_message = '';
 
   // Some fields are empty.
-  if (empty($api_subdomain) OR empty($api_key) OR empty($api_secret)) {
+  if (empty($api_subdomain) || empty($api_key) || empty($api_secret)) {
     $error_message = t('Please fill out each of the fields below');
   }
   // All fields filled out.
@@ -401,8 +397,6 @@ function oneall_social_login_admin_ajax_check_api_connection_settings($form, &$f
   else {
     drupal_set_message(check_plain($error_message), 'error oneall_social_login');
   }
-
-  // Done.
   return $form['oneall_social_login_api_settings'];
 }
 

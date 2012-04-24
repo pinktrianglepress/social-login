@@ -5,9 +5,8 @@
  */
 
 /**
- * @package   	OneAll Social Login Core
- * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
- * @license   	GNU/GPL 2 or later
+ * @package OneAll Social Login Core
+ * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
  */
 
 /**
@@ -23,8 +22,6 @@ function oneall_social_login_core_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'oneall_social_login_core.module',
   );
-
-  // Done.
   return $items;
 }
 
@@ -45,7 +42,7 @@ function oneall_social_login_core_check_curl() {
     if (($http_data = curl_exec($curl)) !== FALSE) {
       $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
       curl_close($curl);
-      if ($http_code == 200 AND strtolower($http_data) == 'ok') {
+      if ($http_code == 200 && strtolower($http_data) == 'ok') {
         return TRUE;
       }
     }
@@ -58,7 +55,7 @@ function oneall_social_login_core_check_curl() {
  */
 function oneall_social_login_core_check_fsockopen() {
   $result = drupal_http_request('https://www.oneall.com/ping.html');
-  if (is_object($result) AND property_exists($result, 'code') AND $result->code == 200) {
+  if (is_object($result) && property_exists($result, 'code') && $result->code == 200) {
     if (property_exists($result, 'data')) {
       if (drupal_strtolower($result->data) == 'ok') {
         return TRUE;
@@ -76,7 +73,7 @@ function oneall_social_login_core_do_api_request($handler, $url, $options = arra
   // FSOCKOPEN?
   if ($handler == 'fsockopen') {
     // BASIC AUTH?
-    if (isset($options['api_key']) AND isset($options['api_secret'])) {
+    if (isset($options['api_key']) && isset($options['api_secret'])) {
       if (preg_match('/^(http(s)?:\/\/)(.+)$/i', $url, $matches)) {
         $url = $matches[1];
         $url .= $options['api_key'] . ':' . $options['api_secret'] . '@';
@@ -98,7 +95,7 @@ function oneall_social_login_core_do_api_request($handler, $url, $options = arra
     curl_setopt($curl, CURLOPT_HEADER, 0);
 
     // BASIC AUTH?
-    if (isset($options['api_key']) AND isset($options['api_secret'])) {
+    if (isset($options['api_key']) && isset($options['api_secret'])) {
       curl_setopt($curl, CURLOPT_USERPWD, $options['api_key'] . ":" . $options['api_secret']);
     }
     curl_setopt($curl, CURLOPT_TIMEOUT, 15);
@@ -128,7 +125,10 @@ function oneall_social_login_core_callback_handler() {
   $settings = oneall_social_login_core_get_settings();
 
   // No need to do anything if we haven't received these arguments.
-  if (isset($_POST) AND !empty($_POST['connection_token']) AND !empty($_POST['oa_action']) AND in_array($_POST['oa_action'], array('social_login', 'social_link'))) {
+  if (isset($_POST)
+      && !empty($_POST['connection_token'])
+      && !empty($_POST['oa_action'])
+      && in_array($_POST['oa_action'], array('social_login', 'social_link'))) {
     // Clear session.
     oneall_social_login_core_clear_session();
 
@@ -140,7 +140,7 @@ function oneall_social_login_core_callback_handler() {
     $token = trim($_POST['connection_token']);
 
     // Settings missing.
-    if (empty($api_subdomain) OR empty($api_key) OR empty($api_secret)) {
+    if (empty($api_subdomain) || empty($api_key) || empty($api_secret)) {
       drupal_set_message(t('OneAll Social Login is not setup correctly, please request the administrator to verify the API Settings'), 'error');
       watchdog('oneall_social_login_core', 'The API Settings are not filled out correctly', WATCHDOG_ERROR);
     }
@@ -149,11 +149,14 @@ function oneall_social_login_core_callback_handler() {
 
       // Request identity details API.
       $data = oneall_social_login_core_do_api_request($handler, 'https://' . $api_subdomain . '.api.oneall.com/connections/' . $token . '.json', array('api_key' => $api_key, 'api_secret' => $api_secret));
-      if (is_array($data) AND !empty($data['http_data'])) {
+      if (is_array($data) && !empty($data['http_data'])) {
         $social_data = @drupal_json_decode($data['http_data']);
 
         // Everything seems to be ok.
-        if (is_array($social_data) AND isset ($social_data['response']) AND isset ($social_data['response']['request']['status']['code']) AND $social_data['response']['request']['status']['code'] == 200) {
+        if (is_array($social_data)
+            && isset ($social_data['response'])
+            && isset ($social_data['response']['request']['status']['code'])
+            && $social_data['response']['request']['status']['code'] == 200) {
 
           // Used plugin.
           $data = $social_data['response']['result']['data'];
@@ -176,7 +179,7 @@ function oneall_social_login_core_callback_handler() {
           $user_for_token = oneall_social_login_core_get_user_for_user_token($user_token);
 
           // Existing user.
-          if (is_object($user_for_token) AND !empty($user_for_token->uid)) {
+          if (is_object($user_for_token) && !empty($user_for_token->uid)) {
 
             // Social Login Plugin used?
             if ($data['plugin']['key'] == 'social_login') {
@@ -197,7 +200,7 @@ function oneall_social_login_core_callback_handler() {
               global $user;
 
               // User is logged in.
-              if (is_object($user) AND !empty($user->uid)) {
+              if (is_object($user) && !empty($user->uid)) {
 
                 // The existing token does not match the current user!
                 if ($user_for_token->uid <> $user->uid) {
@@ -268,12 +271,15 @@ function oneall_social_login_core_callback_handler() {
  */
 function oneall_social_login_core_user_insert(&$edit, $account, $category) {
   // Check if we come from a valid session.
-  if (isset($_SESSION) AND !empty($_SESSION['oneall_social_login_session_open']) AND !empty($_SESSION['oneall_social_login_social_data'])) {
+  if (isset($_SESSION) && !empty($_SESSION['oneall_social_login_session_open']) && !empty($_SESSION['oneall_social_login_social_data'])) {
     // Restore data.
     $social_data = @unserialize($_SESSION['oneall_social_login_social_data']);
 
     // Check format.
-    if (is_array($social_data) AND isset ($social_data['response']) AND isset ($social_data['response']['request']['status']['code']) AND $social_data['response']['request']['status']['code'] == 200) {
+    if (is_array($social_data)
+        && isset ($social_data['response'])
+        && isset ($social_data['response']['request']['status']['code'])
+        && $social_data['response']['request']['status']['code'] == 200) {
       // Retrieve required data.
       $user_data = $social_data['response']['result']['data']['user'];
 
@@ -287,7 +293,7 @@ function oneall_social_login_core_user_insert(&$edit, $account, $category) {
       $provider_name = $user_data['identity']['source']['name'];
 
       // Tie user to token.
-      if (!empty($user_token) AND !empty($identity_token) AND !empty($provider_name)) {
+      if (!empty($user_token) && !empty($identity_token) && !empty($provider_name)) {
         oneall_social_login_core_map_identity_token_to_user_token($account, $identity_token, $user_token, $provider_name);
       }
     }
@@ -303,12 +309,15 @@ function oneall_social_login_core_user_insert(&$edit, $account, $category) {
  */
 function oneall_social_login_core_user_login(&$edit, $account) {
   // Check if we come from a valid session.
-  if (isset($_SESSION) AND !empty($_SESSION['oneall_social_login_session_open']) AND !empty($_SESSION['oneall_social_login_social_data'])) {
+  if (isset($_SESSION) && !empty($_SESSION['oneall_social_login_session_open']) && !empty($_SESSION['oneall_social_login_social_data'])) {
     // Restore data.
     $social_data = @unserialize($_SESSION['oneall_social_login_social_data']);
 
     // Check format.
-    if (is_array($social_data) AND isset ($social_data['response']) AND isset ($social_data['response']['request']['status']['code']) AND $social_data['response']['request']['status']['code'] == 200) {
+    if (is_array($social_data)
+        && isset ($social_data['response'])
+        && isset ($social_data['response']['request']['status']['code'])
+        && $social_data['response']['request']['status']['code'] == 200) {
       // Retrieve required data.
       $user_data = $social_data['response']['result']['data']['user'];
 
@@ -369,7 +378,12 @@ function oneall_social_login_core_map_identity_token_to_user_token($account, $id
     user_set_authmaps($account, array('authname_oneall_social_login' => $user_token));
 
     // Get the new authmap identifier.
-    $aid = db_select('authmap', 'a')->fields('a', array('aid'))->condition('module', 'oneall_social_login', '=')->condition('authname', $user_token, '=')->execute()->fetchField();
+    $aid = db_select('authmap', 'a')
+           ->fields('a', array('aid'))
+           ->condition('module', 'oneall_social_login', '=')
+           ->condition('authname', $user_token, '=')
+           ->execute()
+           ->fetchField();
     if (is_numeric($aid)) {
 
       // Remove duplicate identities.
@@ -381,7 +395,6 @@ function oneall_social_login_core_map_identity_token_to_user_token($account, $id
        'identity_token' => $identity_token,
        'provider_name' => $provider_name))->execute();
 
-      // Done.
       return TRUE;
     }
   }
@@ -400,14 +413,17 @@ function oneall_social_login_core_map_identity_token_to_user_token($account, $id
  */
 function oneall_social_login_core_form_alter(&$form, &$form_state) {
   // Hook into login page.
-  if (is_array($form) AND isset($form['#form_id']) AND $form['#form_id'] == 'user_login') {
+  if (is_array($form) && isset($form['#form_id']) && $form['#form_id'] == 'user_login') {
     // Check if we come from a valid session.
-    if (isset($_SESSION) AND !empty($_SESSION['oneall_social_login_session_open']) AND !empty($_SESSION['oneall_social_login_social_data'])) {
+    if (isset($_SESSION) && !empty($_SESSION['oneall_social_login_session_open']) && !empty($_SESSION['oneall_social_login_social_data'])) {
       // Restore data.
       $social_data = @unserialize($_SESSION['oneall_social_login_social_data']);
 
       // Check format.
-      if (is_array($social_data) AND isset ($social_data['response']) AND isset ($social_data['response']['request']['status']['code']) AND $social_data['response']['request']['status']['code'] == 200) {
+      if (is_array($social_data)
+          && isset ($social_data['response'])
+          && isset ($social_data['response']['request']['status']['code'])
+          && $social_data['response']['request']['status']['code'] == 200) {
         // Read settings.
         $settings = oneall_social_login_core_get_settings();
 
@@ -415,7 +431,7 @@ function oneall_social_login_core_form_alter(&$form, &$form_state) {
         $provider_name = $social_data['response']['result']['data']['user']['identity']['source']['name'];
 
         // No message if the module is not shown on the registration page.
-        if (empty($settings['registration_page_icons']) OR $settings['registration_page_icons'] <> 'disable') {
+        if (empty($settings['registration_page_icons']) || $settings['registration_page_icons'] <> 'disable') {
           $form['oneall_social_login_core_create_account'] = array(
             '#type' => 'item',
             '#weight' => -110,
@@ -441,12 +457,17 @@ function oneall_social_login_core_form_alter(&$form, &$form_state) {
  */
 function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_state) {
   // Check if we come from a valid session.
-  if (isset($_SESSION) AND !empty($_SESSION['oneall_social_login_session_open']) AND !empty($_SESSION['oneall_social_login_social_data'])) {
+  if (isset($_SESSION)
+      && !empty($_SESSION['oneall_social_login_session_open'])
+      && !empty($_SESSION['oneall_social_login_social_data'])) {
     // Restore data.
     $social_data = @unserialize($_SESSION['oneall_social_login_social_data']);
 
     // Check format.
-    if (is_array($social_data) AND isset ($social_data['response']) AND isset ($social_data['response']['request']['status']['code']) AND $social_data['response']['request']['status']['code'] == 200) {
+    if (is_array($social_data)
+        && isset ($social_data['response'])
+        && isset ($social_data['response']['request']['status']['code'])
+        && $social_data['response']['request']['status']['code'] == 200) {
 
       // Read settings.
       $settings = oneall_social_login_core_get_settings();
@@ -460,8 +481,8 @@ function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_s
       // Email.
       $user_email = '';
       $user_email_is_verified = FALSE;
-      if (isset ($identity['emails']) AND is_array($identity['emails'])) {
-        while (!$user_email_is_verified AND (list(, $email) = each($identity['emails']))) {
+      if (isset ($identity['emails']) && is_array($identity['emails'])) {
+        while (!$user_email_is_verified && (list(, $email) = each($identity['emails']))) {
           $user_email = $email['value'];
           $user_email_is_verified = ($email['is_verified'] == '1');
         }
@@ -487,11 +508,11 @@ function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_s
       $form['account']['mail']['#default_value'] = $user_email;
 
       // Don't show message if the module is not on the registration page.
-      if (empty($settings['login_page_icons']) OR $settings['login_page_icons'] <> 'disable') {
+      if (empty($settings['login_page_icons']) || $settings['login_page_icons'] <> 'disable') {
         $form['oneall_social_login_core_link_account'] = array(
           '#type' => 'item',
           '#weight' => -100,
-          '#title' => t('I already have an account'),
+          '#title' => t('Do you already have an account?'),
           '#description' => t('If you have already an account on this website, <a href="@link_login">log in</a> to link your @social_network to the existing account.', array('@social_network' => $provider_name, '@link_login' => url('user'))),
         );
       }
@@ -500,8 +521,8 @@ function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_s
       $form['oneall_social_login_core_create_account'] = array(
         '#type' => 'item',
         '#weight' => -100,
-        '#title' => t('I would like to create a new account'),
-        '#description' => t('Please fill out the form below. Your @social_network account will be linked to the new account and you can then  use @social_network to log in.', array('@social_network' => $provider_name)),
+        '#title' => t('Would you like to create a new account?'),
+        '#description' => t('Please complete the form to create your account. Once your account has been created, you can use @social_network to log in.', array('@social_network' => $provider_name)),
       );
     }
   }
@@ -566,7 +587,7 @@ function oneall_social_login_core_get_settings() {
   $results = db_query("SELECT setting, value FROM {oneall_social_login_settings}");
   foreach ($results as $result) {
     $settings[$result->setting] = $result->value;
-    if (drupal_substr($result->setting, 0, 8) == 'provider' AND !empty($result->value)) {
+    if (drupal_substr($result->setting, 0, 8) == 'provider' && !empty($result->value)) {
       $settings['enabled_providers'][] = drupal_substr($result->setting, 9, drupal_strlen($result->setting));
     }
   }
@@ -578,8 +599,8 @@ function oneall_social_login_core_get_settings() {
  * Add a Link to the footer.
  */
 function oneall_social_login_core_preprocess_page(&$vars, $hook) {
-  if (is_array($vars['page']) AND isset($vars['page']) AND isset($vars['page']['footer'])) {
-    if (isset ($vars['page']['footer']['system_powered-by']) AND isset ($vars['page']['footer']['system_powered-by']['#markup'])) {
+  if (is_array($vars['page']) && isset($vars['page']) && isset($vars['page']['footer'])) {
+    if (isset ($vars['page']['footer']['system_powered-by']) && isset ($vars['page']['footer']['system_powered-by']['#markup'])) {
       $vars['page']['footer']['system_powered-by']['#markup'] .= '&nbsp; | &nbsp;'
       . t('<a href="@link_social_login">Social Login</a> powered by <a href="@link_oneall">OneAll</a>',
       array('@link_social_login' => 'http://www.oneall.com/' . 'services/single-sign-on/', '@link_oneall' => 'http://www.oneall.com'));

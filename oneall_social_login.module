@@ -5,9 +5,8 @@
  */
 
 /**
- * @package   	OneAll Social Login Module
- * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
- * @license   	GNU/GPL 2 or later
+ * @package OneAll Social Login Module
+ * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
  */
 
 /**
@@ -31,8 +30,6 @@ function oneall_social_login_menu() {
     ),
     'file' => 'oneall_social_login.admin.inc',
   );
-
-  // Done.
   return $items;
 }
 

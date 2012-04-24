@@ -6,9 +6,8 @@
  */
 
 /**
- * @package   	OneAll Social Login Widget
- * @copyright 	Copyright 2012 http://www.oneall.com - All rights reserved.
- * @license   	GNU/GPL 2 or later
+ * @package OneAll Social Login Widget
+ * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
  */
 
 
@@ -44,12 +43,12 @@ function oneall_social_login_widget_add_js_plugin($plugin_type, $subdomain, $pro
 
     // Build Javascript.
     $js = "oneall.api.plugins." . $plugin_type . ".build(\"" . $containerid . "\", {
-						'providers' : ['" . implode("','", $providers) . "'],
-						'callback_uri': '" . $callback_uri . "',
-						'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
-						'user_token': '" . (!empty($token) ? $token : '') . "',
-						'css_theme_uri' : '" . (($https_enabled ? 'https://secure.' : ' http://public.') . 'oneallcdn.com/css/api/socialize/themes/drupal/default.css') . "'
-					 }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal / v1.0 -->";
+           'providers' : ['" . implode("','", $providers) . "'],
+           'callback_uri': '" . $callback_uri . "',
+           'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
+           'user_token': '" . (!empty($token) ? $token : '') . "',
+           'css_theme_uri' : '" . (($https_enabled ? 'https://secure.' : ' http://public.') . 'oneallcdn.com/css/api/socialize/themes/drupal/default.css') . "'
+           }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal / v1.0 -->";
 
     // Add login buttons.
     drupal_add_js($js, array('type' => 'inline', 'scope' => 'footer'));
@@ -74,7 +73,7 @@ function oneall_social_login_widget_form_alter(&$form, &$form_state) {
 
     // Hook into registration page.
     default:
-      if (isset($form['#user_category']) AND $form['#user_category'] == 'register') {
+      if (isset($form['#user_category']) && $form['#user_category'] == 'register') {
         oneall_social_login_widget_show_providers($form, $form_state, 'registration_page');
       }
       break;
@@ -113,7 +112,7 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
       $plugin_type = 'social_login';
 
       // Don't show if disabled by admin.
-      if (empty($settings['side_panel_icons']) OR $settings['side_panel_icons'] <> 'disable') {
+      if (empty($settings['side_panel_icons']) || $settings['side_panel_icons'] <> 'disable') {
         $widget_enabled = TRUE;
         $title = (!empty($settings['side_panel_caption']) ? $settings['side_panel_caption'] : '');
         $position = ($settings['side_panel_icons'] == 'below' ? 100 : -100);
@@ -127,7 +126,7 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
       // Don't show if there is already a session.
       if (empty($_SESSION['oneall_social_login_session_open'])) {
         // Don't show if disabled by admin.
-        if (empty($settings['registration_page_icons']) OR $settings['registration_page_icons'] <> 'disable') {
+        if (empty($settings['registration_page_icons']) || $settings['registration_page_icons'] <> 'disable') {
           $widget_enabled = TRUE;
           $title = (!empty($settings['registration_page_caption']) ? $settings['registration_page_caption'] : '');
           $position = ($settings['registration_page_icons'] == 'below' ? 100 : -100);
@@ -141,7 +140,7 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
 
       // Don't show if there is already a session.
       if (empty($_SESSION['oneall_social_login_session_open'])) {
-        if (empty($settings['login_page_icons']) OR $settings['login_page_icons'] <> 'disable') {
+        if (empty($settings['login_page_icons']) || $settings['login_page_icons'] <> 'disable') {
           $widget_enabled = TRUE;
           $title = (!empty($settings['login_page_caption']) ? $settings['login_page_caption'] : '');
           $position = ($settings['login_page_icons'] == 'above' ? -100 : 100);
@@ -151,7 +150,7 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
 
     // Edit Profile Page.
     case 'edit_profile_page':
-      if (empty($settings['profile_page_icons']) OR $settings['profile_page_icons'] <> 'disable') {
+      if (empty($settings['profile_page_icons']) || $settings['profile_page_icons'] <> 'disable') {
         // Needed to retrieve his token.
         global $user;
 
@@ -225,15 +224,23 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
  */
 function oneall_social_login_widget_is_ssl() {
   if (isset($_SERVER['HTTPS'])) {
-    if (drupal_strtolower($_SERVER['HTTPS']) == 'on' OR $_SERVER['HTTPS'] == '1') {
+    if (drupal_strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == '1') {
       return TRUE;
     }
   }
-  elseif (isset($_SERVER['SERVER_PORT'])) {
+
+  if (isset($_SERVER['SERVER_PORT'])) {
     if ($_SERVER['SERVER_PORT'] == '443') {
       return TRUE;
     }
   }
+
+  if (isset($_SERVER ['HTTP_X_FORWARDED_PROTO'])) {
+    if (drupal_strtolower($_SERVER ['HTTP_X_FORWARDED_PROTO']) == 'https') {
+      return TRUE;
+    }
+  }
+
   return FALSE;
 }
 
@@ -250,11 +257,9 @@ function oneall_social_login_widget_get_settings() {
   $results = db_query("SELECT setting, value FROM {oneall_social_login_settings}");
   foreach ($results as $result) {
     $settings[$result->setting] = $result->value;
-    if (drupal_substr($result->setting, 0, 8) == 'provider' AND !empty($result->value)) {
+    if (drupal_substr($result->setting, 0, 8) == 'provider' && !empty($result->value)) {
       $settings['enabled_providers'][] = drupal_substr($result->setting, 9, drupal_strlen($result->setting));
     }
   }
-
-  // Done.
   return $settings;
 }
