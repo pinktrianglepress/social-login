@@ -255,7 +255,7 @@ function oneall_social_login_core_callback_handler() {
         }
       }
       else {
-        watchdog('oneall_social_login_core', 'CURL Error:' . curl_error($curl), WATCHDOG_ERROR);
+        watchdog('oneall_social_login_core', 'Invalid JSON received from resource', WATCHDOG_ERROR);
       }
     }
   }
