@@ -192,7 +192,7 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
   // Enabled.
   if ($widget_enabled === TRUE) {
     // Container to add the buttons to.
-    $containerid = 'oneall_social_login_provider_' . rand(99999, 9999999);
+    $containerid = 'oneall_social_login_providers_' . rand(99999, 9999999);
 
     // Add javascript to display the plugin.
     oneall_social_login_widget_add_js_plugin($plugin_type, $settings['api_subdomain'], $settings['enabled_providers'], $containerid, $token);
@@ -205,19 +205,34 @@ function oneall_social_login_widget_show_providers(&$form, &$form_state, $target
         '#weight' => $position,
       );
       $form['oneall_social_login_' . $containerid]['inner_block'] = array(
-        '#prefix' => '<div style="margin:20px 0 10px 0"><div id="' . $containerid . '">',
-        '#suffix' => '</div></div>',
+        '#prefix' => theme('oneall_social_login_widget_provider_container', array('containerid' => $containerid, 'label' => '')),
       );
     }
     else {
       $form['oneall_social_login_' . $containerid] = array(
-        '#prefix' => '<div style="margin:20px 0 10px 0"><label>' . $title . '</label><div id="' . $containerid . '">',
-        '#suffix' => '</div></div>',
+        '#prefix' => theme('oneall_social_login_widget_provider_container', array('containerid' => $containerid, 'label' => $title)),
         '#weight' => $position,
       );
     }
   }
 }
+
+/**
+ * Theme template used to display the social providers.
+ */
+function oneall_social_login_widget_theme() {
+  return array(
+    'oneall_social_login_widget_provider_container' => array(
+      'template' => 'provider_container',
+      'path' => drupal_get_path('module', 'oneall_social_login_widget') . '/theme',
+      'variables' => array(
+        'containerid' => NULL,
+        'label' => NULL,
+      ),
+    ),
+  );
+}
+
 
 /**
  * Check if the current page has been opened through https.
