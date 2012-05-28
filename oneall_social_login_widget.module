@@ -250,8 +250,8 @@ function oneall_social_login_widget_is_ssl() {
     }
   }
 
-  if (isset($_SERVER ['HTTP_X_FORWARDED_PROTO'])) {
-    if (drupal_strtolower($_SERVER ['HTTP_X_FORWARDED_PROTO']) == 'https') {
+  if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+    if (drupal_strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https') {
       return TRUE;
     }
   }

@@ -267,7 +267,6 @@ function oneall_social_login_core_callback_handler() {
 
 /**
  * Implements hook_user_insert().
- * Ties the social network account to a new user account after signup.
  */
 function oneall_social_login_core_user_insert(&$edit, $account, $category) {
   // Check if we come from a valid session.
@@ -305,7 +304,6 @@ function oneall_social_login_core_user_insert(&$edit, $account, $category) {
 
 /**
  * Implements hook_user_login().
- * Ties the social network profile to an existing account when the user logs in.
  */
 function oneall_social_login_core_user_login(&$edit, $account) {
   // Check if we come from a valid session.
@@ -630,7 +628,11 @@ function oneall_social_login_core_get_available_providers() {
       'name' => 'Google',
     ), 'linkedin' => array(
       'name' => 'LinkedIn',
-    ), 'yahoo' => array(
+    ), 'github' => array(
+      'name' => 'Github.com',
+    ), 'skyrock' => array(
+      'name' => 'Skyrock.com',
+    ),'yahoo' => array(
       'name' => 'Yahoo',
     ), 'openid' => array(
       'name' => 'OpenID',

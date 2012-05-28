@@ -52,6 +52,8 @@ networks and identity providers:
 - Facebook
 - LinkedIn
 - Paypal
+- Github.com
+- Skyrock.com
 - LiveJournal
 - Hyves
 - OpenID
@@ -61,3 +63,5 @@ networks and identity providers:
 - StackExchange
 - Wordpress
 - Steam Community
+- Mail.ru
+- Windows Live
