@@ -10,10 +10,9 @@
  */
 
 /**
- * Setup the callback handler uri.
+ * Implements hook_menu().
  */
 function oneall_social_login_core_menu() {
-
   // Setup callback handler.
   $items['oneall_social_login/callback'] = array(
     'title' => 'OneAll Social Login Callback',
@@ -69,7 +68,6 @@ function oneall_social_login_core_check_fsockopen() {
  * Sends an API request.
  */
 function oneall_social_login_core_do_api_request($handler, $url, $options = array()) {
-
   // FSOCKOPEN?
   if ($handler == 'fsockopen') {
     // BASIC AUTH?
@@ -416,7 +414,7 @@ function oneall_social_login_core_map_identity_token_to_user_token($account, $id
 
 
 /**
- * Add information to the the login form.
+ * Implements hook_form_alter().
  */
 function oneall_social_login_core_form_alter(&$form, &$form_state) {
   // Hook into login page.
@@ -460,7 +458,7 @@ function oneall_social_login_core_form_alter(&$form, &$form_state) {
 
 
 /**
- * Prepopluate the registration form with values.
+ * Implements hook_form_USER_REGISTER_alter().
  */
 function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_state) {
   // Check if we come from a valid session.

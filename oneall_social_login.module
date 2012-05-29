@@ -10,7 +10,7 @@
  */
 
 /**
- * Link to admin/config/people/oneall_social_login.
+ * Implements hook_menu().
  */
 function oneall_social_login_menu() {
 
@@ -34,7 +34,7 @@ function oneall_social_login_menu() {
 }
 
 /**
- * Link to admin/help/oneall_social_login.
+ * Implements hook_help().
  */
 function oneall_social_login_help($path, $arg) {
   switch ($path) {

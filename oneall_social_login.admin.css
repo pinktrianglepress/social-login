@@ -85,3 +85,11 @@ div.messages.oneall_social_login {
 .oneall_social_login_provider.oneall_social_login_provider_mailru {
   background-position: -853px -1px;
 }
+
+.oneall_social_login_provider.oneall_social_login_provider_skyrock {
+  background-position: -890px -1px;
+}
+
+.oneall_social_login_provider.oneall_social_login_provider_github {
+  background-position: -927px -1px;
+}
