@@ -4,10 +4,6 @@
  * Contains the core functions used by the OneAll Social Login Module.
  */
 
-/**
- * @package OneAll Social Login Core
- * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
- */
 
 /**
  * Implements hook_menu().

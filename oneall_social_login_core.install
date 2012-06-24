@@ -6,11 +6,6 @@
  */
 
 /**
- * @package OneAll Social Login Core
- * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
- */
-
-/**
  * Implements hook_schema().
  */
 function oneall_social_login_core_schema() {

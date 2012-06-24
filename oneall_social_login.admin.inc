@@ -1,14 +1,10 @@
 <?php
 /**
  * @file
- * Contains the administration are interface for the Oneall Social Login Module.
+ * Contains the administration area interface for the Oneall Social Login Module.
  * The user may chose where to display the module and setup it's behavior.
  */
 
-/**
- * @package OneAll Social Login Admin
- * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
- */
 
 /**
  * Displays the settings page.

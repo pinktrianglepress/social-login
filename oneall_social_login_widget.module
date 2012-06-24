@@ -4,13 +4,8 @@
  * Adds the OneAll Social Login widget at the locations
  * chosen by the administrator.
  */
-
-/**
- * @package OneAll Social Login Widget
- * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
- */
-
-
+ 
+ 
 /**
  * Add the javascript library.
  */

@@ -4,10 +4,6 @@
  * Adds the link to the module to the administration area.
  */
 
-/**
- * @package OneAll Social Login Module
- * @copyright Copyright 2012 http://www.oneall.com - All rights reserved.
- */
 
 /**
  * Implements hook_menu().
