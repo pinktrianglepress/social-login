@@ -13,7 +13,7 @@ function oneall_social_login_menu() {
   // Container.
   $items = array();
 
-  // Link to administration page.
+  // Link to the administration page.
   $items['admin/config/people/oneall_social_login'] = array(
     'title' => 'OneAll Social Login',
     'description' => 'Setup OneAll Social Login and enable the Social Networks of your choice',
@@ -22,7 +22,7 @@ function oneall_social_login_menu() {
       'oneall_social_login_admin_settings',
     ),
     'access arguments' => array(
-      'access administration pages',
+      'administer site configuration',
     ),
     'file' => 'oneall_social_login.admin.inc',
   );
