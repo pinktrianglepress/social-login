@@ -485,7 +485,7 @@ function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_s
       if (isset ($identity['emails']) && is_array($identity['emails'])) {
         while (!$user_email_is_verified && (list(, $email) = each($identity['emails']))) {
           $user_email = $email['value'];
-          $user_email_is_verified = ($email['is_verified'] == '1');
+          $user_email_is_verified = (!empty ($email['is_verified']));
         }
       }
 
@@ -514,7 +514,7 @@ function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_s
           '#type' => 'item',
           '#weight' => -100,
           '#title' => t('Do you already have an account?'),
-          '#description' => t('If you have already an account on this website, <a href="@link_login">log in</a> to link your @social_network to the existing account.', array('@social_network' => $provider_name, '@link_login' => url('user'))),
+          '#description' => t('If you have already an account on this website, <a href="@link_login">log in</a> to link @social_network to this account.', array('@social_network' => $provider_name, '@link_login' => url('user'))),
         );
       }
 
@@ -626,8 +626,10 @@ function oneall_social_login_core_get_available_providers() {
       'name' => 'Github.com',
     ), 'skyrock' => array(
       'name' => 'Skyrock.com',
-    ),'yahoo' => array(
+    ), 'yahoo' => array(
       'name' => 'Yahoo',
+    ), 'foursquare' => array(
+      'name' => 'Foursquare',
     ), 'openid' => array(
       'name' => 'OpenID',
     ), 'wordpress' => array(

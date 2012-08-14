@@ -1,15 +1,14 @@
 <?php
 /**
  * @file
- * Contains the administration area interface for the Oneall Social Login Module.
+ * Contains the administration interface for the Oneall Social Login Module.
  * The user may chose where to display the module and setup it's behavior.
  */
-
 
 /**
  * Displays the settings page.
  */
-function oneall_social_login_admin_settings($form, &$form_state) {
+function oneall_social_login_admin_settings ($form, &$form_state) {
 
   // Used to display the provider icons.
   drupal_add_css(drupal_get_path('module', 'oneall_social_login') . '/oneall_social_login.admin.css');
@@ -38,9 +37,11 @@ function oneall_social_login_admin_settings($form, &$form_state) {
   $form['oneall_social_login_api_connection']['http_handler'] = array(
     '#type' => 'select',
     '#title' => t('HTTPS Request Handler'),
-    '#description' => t(
-    'You must allow outgoing HTTPS requests (port 443) and you either need the <a href="@link_curl" target="_blank">PHP cURL library</a> or the <a href="@link_fsockopen" target="_blank">PHP fsockopen function</a> .',
-    array('@link_curl' => 'http://www.php.net/manual/en/book.curl.php', '@link_fsockopen' => 'http://php.net/manual/en/function.fsockopen.php')),
+    '#description' => t('You must allow outgoing HTTPS requests (port 443) and you either need the <a href="@link_curl" target="_blank">PHP cURL library</a> or the <a href="@link_fsockopen" target="_blank">PHP fsockopen function</a> .',
+        array(
+          '@link_curl' => 'http://www.php.net/manual/en/book.curl.php',
+          '@link_fsockopen' => 'http://php.net/manual/en/function.fsockopen.php',
+        )),
     '#options' => array(
       'curl' => t('PHP cURL library'),
       'fsockopen' => t('PHP fsockopen through drupal_http_request()'),
@@ -60,14 +61,14 @@ function oneall_social_login_admin_settings($form, &$form_state) {
     ),
   );
 
-
   // API Settings.
   $form['oneall_social_login_api_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('API Settings'),
     '#id' => 'oneall_social_login_api_settings',
-    '#description' => t('<a href="@setup_oneall_social_login" target="_blank">Click here to create and view your API Credentials</a>',
-    array('@setup_oneall_social_login' => 'https://app.oneall.com/applications/')),
+    '#description' => t('<a href="@setup_oneall_social_login" target="_blank">Click here to create and view your API Credentials</a>', array(
+      '@setup_oneall_social_login' => 'https://app.oneall.com/applications/',
+    )),
   );
 
   // API Subdomain.
@@ -134,7 +135,7 @@ function oneall_social_login_admin_settings($form, &$form_state) {
 
   $form['oneall_social_login_settings_side_panel']['side_panel_caption'] = array(
     '#type' => 'textfield',
-    '#title' => t('Social Login Icons: Caption[Leave empty for none]'),
+    '#title' => t('Social Login Icons: Caption [Leave empty for none]'),
     '#default_value' => (!isset($settings['side_panel_caption']) ? t('Register/Login with:') : $settings['side_panel_caption']),
     '#size' => 60,
     '#maxlength' => 60,
@@ -160,7 +161,7 @@ function oneall_social_login_admin_settings($form, &$form_state) {
 
   $form['oneall_social_login_settings_login_page']['login_page_caption'] = array(
     '#type' => 'textfield',
-    '#title' => t('Social Login Icons: Caption[Leave empty for none]'),
+    '#title' => t('Social Login Icons: Caption [Leave empty for none]'),
     '#default_value' => (!isset($settings['login_page_caption']) ? t('Login with:') : $settings['login_page_caption']),
     '#size' => 60,
     '#maxlength' => 60,
@@ -186,13 +187,12 @@ function oneall_social_login_admin_settings($form, &$form_state) {
 
   $form['oneall_social_login_settings_registration_page']['registration_page_caption'] = array(
     '#type' => 'textfield',
-    '#title' => t('Social Login Icons: Caption[Leave empty for none]'),
+    '#title' => t('Social Login Icons: Caption [Leave empty for none]'),
     '#default_value' => (!isset($settings['registration_page_caption']) ? t('Instantly register with:') : $settings['registration_page_caption']),
     '#size' => 60,
     '#maxlength' => 60,
     '#description' => t('This is the title displayed above the social network icons.'),
   );
-
 
   $form['oneall_social_login_settings_profile_page'] = array(
     '#type' => 'fieldset',
@@ -202,7 +202,7 @@ function oneall_social_login_admin_settings($form, &$form_state) {
   $form['oneall_social_login_settings_profile_page']['profile_page_icons'] = array(
     '#type' => 'select',
     '#title' => t('Social Login Icons'),
-    '#description' => t('Allows the users to link a social network account to their  regular account.'),
+    '#description' => t('Allows the users to link a social network account to their regular account.'),
     '#options' => array(
       'above' => t('Show the Social Login icons above the profile settings'),
       'below' => t('Show the Social Login icons below the profile settings (Default, recommended)'),
@@ -213,13 +213,28 @@ function oneall_social_login_admin_settings($form, &$form_state) {
 
   $form['oneall_social_login_settings_profile_page']['profile_page_caption'] = array(
     '#type' => 'textfield',
-    '#title' => t('Social Login Icons: Caption[Leave empty for none]'),
+    '#title' => t('Social Login Icons: Caption [Leave empty for none]'),
     '#default_value' => (!isset($settings['profile_page_caption']) ? t('Link your account to a social network:') : $settings['profile_page_caption']),
     '#size' => 60,
     '#maxlength' => 60,
     '#description' => t('This is the title displayed above the social network icons.'),
   );
 
+  $form['oneall_social_login_settings_block'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Block Settings'),
+    '#description' => t('Use the Structure\Blocks menu to add Social Login to any region of your theme.'),
+  );
+
+  $form['oneall_social_login_settings_block']['block_icons_loggedin'] = array(
+    '#type' => 'select',
+    '#title' => t('If the user is already logged in:'),
+    '#options' => array(
+      'hide' => t('Hide the Social Login Block (Default, recommended)'),
+      'show' => t('Show the Social Login Block'),
+    ),
+    '#default_value' => (empty($settings['block_icons_loggedin']) ? 'hide' : $settings['block_icons_loggedin']),
+  );
 
   // Enable the social networks/identity providers.
   $form['oneall_social_login_providers'] = array(
@@ -277,11 +292,10 @@ function oneall_social_login_admin_settings($form, &$form_state) {
   return $form;
 }
 
-
 /**
  * Callback handler to autodected the API connection handler.
  */
-function oneall_social_login_admin_ajax_api_connection_autodetect($form, &$form_state) {
+function oneall_social_login_admin_ajax_api_connection_autodetect ($form, &$form_state) {
 
   // Messages.
   $http_handler = '';
@@ -301,29 +315,27 @@ function oneall_social_login_admin_ajax_api_connection_autodetect($form, &$form_
   // Working handler found.
   if (!empty($http_handler)) {
     $form['oneall_social_login_api_connection']['http_handler']['#value'] = $http_handler;
-    drupal_set_message(t('Autodetected @handler - do not forget to save your changes!', array('@handler' => drupal_strtoupper($http_handler))),
-    'status oneall_social_login');
+    drupal_set_message(t('Autodetected @handler - do not forget to save your changes!', array(
+      '@handler' => drupal_strtoupper($http_handler),
+    )), 'status oneall_social_login');
   }
   // Nothing works.
   else {
-    drupal_set_message(t('Sorry, but your firewall blocks outoing requests on port 443. Please open port 443 for outgoing requests.'),
-    'error oneall_social_login');
+    drupal_set_message(t('Sorry, but your firewall blocks outoing requests on port 443. Please open port 443 for outgoing requests.'), 'error oneall_social_login');
   }
   return $form['oneall_social_login_api_connection'];
 }
 
-
 /**
  * Callback Handler to verify the API Settings.
  */
-function oneall_social_login_admin_ajax_check_api_connection_settings($form, &$form_state) {
+function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$form_state) {
 
   // Sanitize data.
   $api_subdomain = (isset($form_state['values']['api_subdomain']) ? trim(drupal_strtolower($form_state['values']['api_subdomain'])) : '');
   $api_key = (isset($form_state['values']) ? trim($form_state['values']['api_key']) : '');
   $api_secret = (isset($form_state['values']) ? trim($form_state['values']['api_secret']) : '');
-  $handler = (isset($form['oneall_social_login_api_connection']['http_handler']['#value'])
-  ? $form['oneall_social_login_api_connection']['http_handler']['#value'] : 'curl');
+  $handler = (isset($form['oneall_social_login_api_connection']['http_handler']['#value']) ? $form['oneall_social_login_api_connection']['http_handler']['#value'] : 'curl');
   $handler = (!in_array(array('curl', 'fsockopen') ? 'curl' : 'fsockopen'));
 
   // Message to be shown.
@@ -392,11 +404,10 @@ function oneall_social_login_admin_ajax_check_api_connection_settings($form, &$f
   return $form['oneall_social_login_api_settings'];
 }
 
-
 /**
  * Saves the administration area settings.
  */
-function oneall_social_login_admin_settings_submit($form, &$form_state) {
+function oneall_social_login_admin_settings_submit ($form, &$form_state) {
 
   // Remove drupal stuff.
   form_state_values_clean($form_state);
