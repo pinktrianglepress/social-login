@@ -24,10 +24,10 @@ function oneall_social_login_core_menu() {
 /**
  * Check if CURL can be used.
  */
-function oneall_social_login_core_check_curl() {
+function oneall_social_login_core_check_curl($protocol = 'https') {
   if (in_array('curl', get_loaded_extensions())) {
     $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, 'https://www.oneall.com/ping.html');
+    curl_setopt($curl, CURLOPT_URL, ((drupal_strtolower($protocol) == 'http' ? 'http' : 'https') . '://www.oneall.com/ping.html'));
     curl_setopt($curl, CURLOPT_HEADER, 0);
     curl_setopt($curl, CURLOPT_TIMEOUT, 15);
     curl_setopt($curl, CURLOPT_VERBOSE, 0);
@@ -37,7 +37,7 @@ function oneall_social_login_core_check_curl() {
     if (($http_data = curl_exec($curl)) !== FALSE) {
       $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
       curl_close($curl);
-      if ($http_code == 200 && strtolower($http_data) == 'ok') {
+      if ($http_code == 200 && drupal_strtolower($http_data) == 'ok') {
         return TRUE;
       }
     }
@@ -48,8 +48,8 @@ function oneall_social_login_core_check_curl() {
 /**
  * Check if fsockopen can be used.
  */
-function oneall_social_login_core_check_fsockopen() {
-  $result = drupal_http_request('https://www.oneall.com/ping.html');
+function oneall_social_login_core_check_fsockopen($protocol = 'https') {
+  $result = drupal_http_request((drupal_strtolower($protocol) == 'http' ? 'http' : 'https') . '://www.oneall.com/ping.html');
   if (is_object($result) && property_exists($result, 'code') && $result->code == 200) {
     if (property_exists($result, 'data')) {
       if (drupal_strtolower($result->data) == 'ok') {
@@ -130,7 +130,13 @@ function oneall_social_login_core_callback_handler() {
     $api_subdomain = (!empty($settings['api_subdomain']) ? $settings['api_subdomain'] : '');
     $api_key = (!empty($settings['api_key']) ? $settings['api_key'] : '');
     $api_secret = (!empty($settings['api_secret']) ? $settings['api_secret'] : '');
+
     $handler = (!empty($settings['http_handler']) ? $settings['http_handler'] : 'curl');
+    $handler = (in_array($handler, array('curl', 'fsockopen')) ? $handler : 'curl');
+
+    $protocol = (!empty($settings['http_protocol']) ? $settings['http_protocol'] : 'https');
+    $protocol = (in_array($protocol, array('http', 'https')) ? $protocol : 'https');
+
     $token = trim($_POST['connection_token']);
 
     // Settings missing.
@@ -142,7 +148,7 @@ function oneall_social_login_core_callback_handler() {
     else {
 
       // Request identity details API.
-      $data = oneall_social_login_core_do_api_request($handler, 'https://' . $api_subdomain . '.api.oneall.com/connections/' . $token . '.json', array('api_key' => $api_key, 'api_secret' => $api_secret));
+      $data = oneall_social_login_core_do_api_request($handler, $protocol . '://' . $api_subdomain . '.api.oneall.com/connections/' . $token . '.json', array('api_key' => $api_key, 'api_secret' => $api_secret));
       if (is_array($data) && !empty($data['http_data'])) {
         $social_data = @drupal_json_decode($data['http_data']);
 
@@ -159,6 +165,7 @@ function oneall_social_login_core_callback_handler() {
           $_SESSION['oneall_social_login_session_open'] = 1;
           $_SESSION['oneall_social_login_session_time'] = time();
           $_SESSION['oneall_social_login_social_data'] = serialize($social_data);
+          $_SESSION['oneall_social_login_origin'] = ( ! empty ($_GET['origin']) ? $_GET['origin'] : '');
 
           // Unique user_token.
           $user_token = $data['user']['user_token'];
@@ -273,6 +280,7 @@ function oneall_social_login_core_user_insert(&$edit, $account, $category) {
         && isset ($social_data['response'])
         && isset ($social_data['response']['request']['status']['code'])
         && $social_data['response']['request']['status']['code'] == 200) {
+
       // Retrieve required data.
       $user_data = $social_data['response']['result']['data']['user'];
 
@@ -288,6 +296,65 @@ function oneall_social_login_core_user_insert(&$edit, $account, $category) {
       // Tie user to token.
       if (!empty($user_token) && !empty($identity_token) && !empty($provider_name)) {
         oneall_social_login_core_map_identity_token_to_user_token($account, $identity_token, $user_token, $provider_name);
+      }
+
+      // Read the OneAll Settings.
+      $settings = oneall_social_login_core_get_settings();
+
+      // If enabled: retrieve the user's picture and save it locally.
+      if ( ! isset ($settings['registration_page_retrieve_avatars']) OR $settings['registration_page_retrieve_avatars'] <> 'disable') {
+
+      	//Check if we have a picture in the social network data
+	      if ( ! empty ($user_data['identity']['pictureUrl']) AND ! empty ($account->uid)) {
+
+	      	//Picture source and target.
+	      	$picture_url = $user_data['identity']['pictureUrl'];
+					$picture_directory =  file_default_scheme() . '://' . variable_get('user_picture_path', 'pictures');
+
+					// Prepare the picture directory
+					if(file_prepare_directory($picture_directory, FILE_CREATE_DIRECTORY)){
+
+						// Base name of the file.
+						$file_base_name = $picture_directory . '/picture-' . $account->uid . '-' . REQUEST_TIME;
+
+						// Get the picture data by using the chosen handler.
+						$handler = (!empty($settings['http_handler']) ? $settings['http_handler'] : 'curl');
+						$handler = (in_array($handler, array('curl', 'fsockopen')) ? $handler : 'curl');
+						$http_result = oneall_social_login_core_do_api_request($handler, $picture_url);
+
+						// Save the picture data locally.
+						$tmp_name = $file_base_name . '.tmp';
+						$tmp_path = file_stream_wrapper_uri_normalize ($tmp_name);
+						$tmp_file = file_save_data ($http_result['http_data'], $tmp_path, FILE_EXISTS_REPLACE);
+
+						// Get the picture details.
+						if (($file_info = image_get_info ($tmp_path)) !== false){
+
+							// Rename the temporary file to the correct extension.
+							$real_name = $file_base_name . '.' . strtolower ($file_info['extension']);
+							$real_path = file_stream_wrapper_uri_normalize ($real_name);
+							$real_file = file_move ($tmp_file, $real_path, FILE_EXISTS_REPLACE);
+
+		      		// Check to make sure the picture isn't too large for the site settings.
+		      		$max_dimensions = variable_get('user_picture_dimensions', '85x85');
+		      		$errors = file_validate_image_resolution($real_file, $max_dimensions);
+
+		      		// Update the database.
+		      		if (count ($errors) == 0) {
+
+		      			// Link the managed file to this user.
+			      		$real_file->uid = $account->uid;
+			      		$real_file = file_save($real_file);
+
+			      		// Link the file usage to user and file.
+			      		file_usage_add($real_file, 'user', 'user', $account->uid);
+
+			      		// Update user record.
+								db_update('users')->fields(array('picture' => $real_file->fid))->condition('uid', $account->uid)->execute();
+		      		}
+						}
+					}
+	      }
       }
     }
 
@@ -344,8 +411,17 @@ function oneall_social_login_core_user_login(&$edit, $account) {
       watchdog('oneall_social_login_core', 'Invalid JSON received from resource', WATCHDOG_ERROR);
     }
 
+    // Restore to origin
+    $origin = (isset ($_SESSION['oneall_social_login_origin']) ? $_SESSION['oneall_social_login_origin'] : '');
+
     // Clear session.
     oneall_social_login_core_clear_session();
+
+    // Redirect to origin
+    if (drupal_strlen (trim ($origin)) > 0)
+    {
+    	drupal_goto($origin);
+    }
   }
 }
 
@@ -534,7 +610,7 @@ function oneall_social_login_core_form_user_register_form_alter(&$form, &$form_s
  * Remove the session data.
  */
 function oneall_social_login_core_clear_session() {
-  foreach (array('session_open', 'session_time', 'social_data') as $key) {
+  foreach (array('session_open', 'session_time', 'social_data', 'origin') as $key) {
     $key = 'oneall_social_login_' . $key;
     if (isset($_SESSION[$key])) {
       unset($_SESSION[$key]);
@@ -630,7 +706,9 @@ function oneall_social_login_core_get_available_providers() {
       'name' => 'Yahoo',
     ), 'foursquare' => array(
       'name' => 'Foursquare',
-    ), 'openid' => array(
+    ), 'youtube' => array(
+      'name' => 'YouTube',
+    ),'openid' => array(
       'name' => 'OpenID',
     ), 'wordpress' => array(
       'name' => 'Wordpress.com',
@@ -646,8 +724,10 @@ function oneall_social_login_core_get_available_providers() {
       'name' => 'StackExchange',
     ), 'steam' => array(
       'name' => 'Steam Community',
-    ), 'mailru' => array(
-      'name' => 'Mail.ru',
+		), 'mailru' => array(
+			'name' => 'Mail.ru',
+    ), 'odnoklassniki' => array(
+      'name' => 'Odnoklassniki',
     ), 'windowslive' => array(
       'name' => 'Windows Live',
     ),

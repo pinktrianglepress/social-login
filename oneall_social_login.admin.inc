@@ -36,8 +36,8 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
 
   $form['oneall_social_login_api_connection']['http_handler'] = array(
     '#type' => 'select',
-    '#title' => t('HTTPS Request Handler'),
-    '#description' => t('You must allow outgoing HTTPS requests (port 443) and you either need the <a href="@link_curl" target="_blank">PHP cURL library</a> or the <a href="@link_fsockopen" target="_blank">PHP fsockopen function</a> .',
+    '#title' => t('API Communication Handler'),
+    '#description' => t('Either <a href="@link_curl" target="_blank">PHP cURL</a> or the <a href="@link_fsockopen" target="_blank">PHP fsockopen function</a> must be available on your server.',
         array(
           '@link_curl' => 'http://www.php.net/manual/en/book.curl.php',
           '@link_fsockopen' => 'http://php.net/manual/en/function.fsockopen.php',
@@ -49,9 +49,32 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     '#default_value' => $default,
   );
 
-  $form['oneall_social_login_api_connection']['verify'] = array(
+  // Default value for protocol.
+  if (!empty($form_state['values']['http_protocol'])) {
+  	$default = $form_state['values']['http_protocol'];
+  }
+  elseif (!empty($settings['http_protocol'])) {
+  	$default = $settings['http_protocol'];
+  }
+  else {
+  	$default = 'https';
+  }
+
+  $form['oneall_social_login_api_connection']['http_protocol'] = array(
+  	'#type' => 'select',
+  	'#title' => t('API Communication Protocol'),
+  	'#description' => t('Your firewall must allow outbound requests either on port 443/HTTPS or on port 80/HTTP.'),
+  	'#options' => array(
+  		'https' => t('Port 443/HTTPS'),
+  		'http' => t('Port 80/HTTP'),
+  	),
+  	'#default_value' => $default,
+  );
+
+	// AutoDetect Button.
+  $form['oneall_social_login_api_connection']['autodetect'] = array(
     '#type' => 'button',
-    '#value' => t('Autodetect'),
+    '#value' => t('Autodetect communication settings'),
     '#weight' => 30,
     '#ajax' => array(
       'callback' => 'oneall_social_login_admin_ajax_api_connection_autodetect',
@@ -124,7 +147,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
   $form['oneall_social_login_settings_side_panel']['side_panel_icons'] = array(
     '#type' => 'select',
     '#title' => t('Social Login Icons'),
-    '#description' => t('Allows the users to login/register with their social network account, or with their already existing account.'),
+    '#description' => t('Allows the users to login/register with their social network account or with their already existing account.'),
     '#options' => array(
       'above' => t('Show the Social Login icons above the existing login form'),
       'below' => t('Show the Social Login icons below the existing login form (Default, recommended)'),
@@ -150,7 +173,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
   $form['oneall_social_login_settings_login_page']['login_page_icons'] = array(
     '#type' => 'select',
     '#title' => t('Social Login Icons'),
-    '#description' => t('Allows the users to login with their social network account, or with their already existing account.'),
+    '#description' => t('Allows the users to login either with their social network account or with their already existing account.'),
     '#options' => array(
       'above' => t('Show the Social Login icons above the existing login form'),
       'below' => t('Show the Social Login icons below the existing login form (Default, recommended)'),
@@ -176,7 +199,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
   $form['oneall_social_login_settings_registration_page']['registration_page_icons'] = array(
     '#type' => 'select',
     '#title' => t('Social Login Icons'),
-    '#description' => t('Allows the users to register by using their social network account, or by creating a regular account.'),
+    '#description' => t('Allows the users to register by using either their social network account or by creating a new account.'),
     '#options' => array(
       'above' => t('Show the Social Login icons above the existing login form (Default, recommended)'),
       'below' => t('Show the Social Login icons below the existing login form'),
@@ -193,6 +216,18 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     '#maxlength' => 60,
     '#description' => t('This is the title displayed above the social network icons.'),
   );
+
+  $form['oneall_social_login_settings_registration_page']['registration_page_retrieve_avatars'] = array(
+  		'#type' => 'select',
+  		'#title' => t('For new users: Retrieve the user avatar from his social network account?'),
+  		'#description' => t('If a user registers for example with Facebook, Social Login grabs his Facebook picture and uses it as avatar for the newly created account.'),
+	    '#options' => array(
+	      'enable' => t('Yes, retrieve the user picture from the social network an use it as avatar for the user (Default)'),
+	      'disable' => t('No, do not retrieve the user picture from the social network'),
+	    ),
+   	 '#default_value' => (empty($settings['registration_page_retrieve_avatars']) ? 'enable' : $settings['registration_page_retrieve_avatars']),
+  );
+
 
   $form['oneall_social_login_settings_profile_page'] = array(
     '#type' => 'fieldset',
@@ -297,31 +332,44 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
  */
 function oneall_social_login_admin_ajax_api_connection_autodetect ($form, &$form_state) {
 
-  // Messages.
+  // Detected Settings.
   $http_handler = '';
+  $http_protocol = '';
 
-  // CURL Works.
-  if (oneall_social_login_core_check_curl() === TRUE) {
+  // CURL+HTTPS Works.
+  if (oneall_social_login_core_check_curl('https') === TRUE) {
     $http_handler = 'curl';
+    $http_protocol = 'https';
   }
-  // CURL does not work.
-  else {
-    // FSOCKOPEN works.
-    if (oneall_social_login_core_check_fsockopen() == TRUE) {
-      $http_handler = 'fsockopen';
-    }
+  // FSOCKOPEN+HTTPS Works.
+  elseif (oneall_social_login_core_check_fsockopen('https') == TRUE) {
+  	$http_handler = 'fsockopen';
+  	$http_protocol = 'https';
+  }
+  // CURL+HTTP Works.
+  elseif (oneall_social_login_core_check_curl('http') === TRUE) {
+  	$http_handler = 'curl';
+  	$http_protocol = 'http';
+  }
+  // FSOCKOPEN+HTTP Works.
+  elseif (oneall_social_login_core_check_fsockopen('http') == TRUE) {
+  	$http_handler = 'fsockopen';
+  	$http_protocol = 'http';
   }
 
   // Working handler found.
   if (!empty($http_handler)) {
     $form['oneall_social_login_api_connection']['http_handler']['#value'] = $http_handler;
-    drupal_set_message(t('Autodetected @handler - do not forget to save your changes!', array(
-      '@handler' => drupal_strtoupper($http_handler),
+    $form['oneall_social_login_api_connection']['http_protocol']['#value'] = $http_protocol;
+
+    drupal_set_message(t('Autodetected @handler on port @port - do not forget to save your changes!', array(
+      '@handler' => ($http_handler == 'curl' ? 'PHP cURL' : 'PHP fsockopen' ),
+      '@port' => ($http_protocol == 'http' ? '80/HTTP' : '443/HTTPS'),
     )), 'status oneall_social_login');
   }
   // Nothing works.
   else {
-    drupal_set_message(t('Sorry, but your firewall blocks outoing requests on port 443. Please open port 443 for outgoing requests.'), 'error oneall_social_login');
+    drupal_set_message(t('Sorry, but the autodetection failed. Please try to open port 80/443 for outbound requests and install PHP cURL/fsockopen.'), 'error oneall_social_login');
   }
   return $form['oneall_social_login_api_connection'];
 }
@@ -335,8 +383,12 @@ function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$
   $api_subdomain = (isset($form_state['values']['api_subdomain']) ? trim(drupal_strtolower($form_state['values']['api_subdomain'])) : '');
   $api_key = (isset($form_state['values']) ? trim($form_state['values']['api_key']) : '');
   $api_secret = (isset($form_state['values']) ? trim($form_state['values']['api_secret']) : '');
+
   $handler = (isset($form['oneall_social_login_api_connection']['http_handler']['#value']) ? $form['oneall_social_login_api_connection']['http_handler']['#value'] : 'curl');
-  $handler = (!in_array(array('curl', 'fsockopen') ? 'curl' : 'fsockopen'));
+  $handler = (in_array($handler, array('curl', 'fsockopen')) ? $handler : 'curl');
+
+  $protocol = (isset($form['oneall_social_login_api_connection']['http_protocol']['#value']) ? $form['oneall_social_login_api_connection']['http_protocol']['#value'] : 'https');
+  $protocol = (in_array($protocol, array('http', 'https')) ? $protocol : 'https');
 
   // Message to be shown.
   $error_message = '';
@@ -346,11 +398,11 @@ function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$
   if (empty($api_subdomain) || empty($api_key) || empty($api_secret)) {
     $error_message = t('Please fill out each of the fields below');
   }
-  // All fields filled out.
+  // All fields has been filled out.
   else {
     // Wrapper for full domains.
     if (preg_match("/([a-z0-9\-]+)\.api\.oneall\.com/i", $api_subdomain, $matches)) {
-      $api_subdomain = $matches[1];
+      $api_subdomain = trim($matches[1]);
     }
 
     // Wrong syntax.
@@ -361,7 +413,7 @@ function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$
     else {
 
       // Build API Settings.
-      $api_domain = 'https://' . $api_subdomain . '.api.oneall.com/tools/ping.json';
+      $api_domain = $protocol . '://' . $api_subdomain . '.api.oneall.com/tools/ping.json';
       $api_options = array(
         'api_key' => $api_key,
         'api_secret' => $api_secret,
@@ -370,7 +422,7 @@ function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$
       // Send request.
       $result = oneall_social_login_core_do_api_request($handler, $api_domain, $api_options);
       if (!is_array($result)) {
-        $error_message = t('Could not contact API. Your firewall probably blocks outoing requests on port 443');
+        $error_message = t('Could not contact API. Your firewall probably blocks outoing requests on both ports (443 and 80)');
       }
       else {
         switch ($result['http_code']) {
