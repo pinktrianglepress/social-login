@@ -461,7 +461,7 @@ function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$
  */
 function oneall_social_login_admin_settings_submit ($form, &$form_state) {
 
-  // Remove drupal stuff.
+  // Remove Drupal stuff.
   form_state_values_clean($form_state);
 
   // Save values.
@@ -471,7 +471,13 @@ function oneall_social_login_admin_settings_submit ($form, &$form_state) {
 
     // API Subdomain.
     if ($setting == 'api_subdomain') {
+    	// The subdomain is always in lower-case
       $value = drupal_strtolower($value);
+
+      // Wrapper for full domains.
+      if (preg_match("/([a-z0-9\-]+)\.api\.oneall\.com/i", $value, $matches)) {
+      	$value = trim($matches[1]);
+      }
     }
 
     $oaslsid = db_select('oneall_social_login_settings', 'o')->fields('o', array('oaslsid'))->condition('setting', $setting, '=')->execute()->fetchField();

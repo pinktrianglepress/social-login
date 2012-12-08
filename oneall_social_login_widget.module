@@ -304,20 +304,16 @@ function oneall_social_login_widget_get_settings () {
   $settings['http_handler'] = 'curl';
   $settings['http_protocol'] = 'https';
 
-  $settings['side_panel_icons'] = 'enable';
   $settings['side_panel_icons'] = 'below';
   $settings['side_panel_caption'] = '';
 
-  $settings['registration_page_icons'] = 'enable';
   $settings['registration_page_icons'] = 'below';
   $settings['registration_page_caption'] = '';
   $settings['registration_page_retrieve_avatars'] = 'enable';
 
-  $settings['login_page_icons'] = 'enable';
   $settings['login_page_icons'] = 'above';
   $settings['login_page_caption'] = '';
 
-  $settings['profile_page_icons'] = 'enable';
   $settings['profile_page_icons'] = 'below';
   $settings['profile_page_caption'] = '';
 
