@@ -98,7 +98,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
   $form['oneall_social_login_api_settings']['api_subdomain'] = array(
     '#id' => 'api_subdomain',
     '#type' => 'textfield',
-    '#title' => t('API Subdomain:'),
+    '#title' => t('API Subdomain'),
     '#default_value' => (!empty($settings['api_subdomain']) ? $settings['api_subdomain'] : ''),
     '#size' => 60,
     '#maxlength' => 60,
@@ -108,7 +108,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
   $form['oneall_social_login_api_settings']['api_key'] = array(
     '#id' => 'api_key',
     '#type' => 'textfield',
-    '#title' => t('API Public Key:'),
+    '#title' => t('API Public Key'),
     '#default_value' => (!empty($settings['api_key']) ? $settings['api_key'] : ''),
     '#size' => 60,
     '#maxlength' => 60,
@@ -118,7 +118,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
   $form['oneall_social_login_api_settings']['api_secret'] = array(
     '#id' => 'api_secret',
     '#type' => 'textfield',
-    '#title' => t('API Private Key:'),
+    '#title' => t('API Private Key'),
     '#default_value' => (!empty($settings['api_secret']) ? $settings['api_secret'] : ''),
     '#size' => 60,
     '#maxlength' => 60,
@@ -138,7 +138,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     ),
   );
 
-  // Settings.
+  // Side panel settings.
   $form['oneall_social_login_settings_side_panel'] = array(
     '#type' => 'fieldset',
     '#title' => t('Side Panel Settings'),
@@ -151,7 +151,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     '#options' => array(
       'above' => t('Show the Social Login icons above the existing login form'),
       'below' => t('Show the Social Login icons below the existing login form (Default, recommended)'),
-      'disable' => t('Do not show the Social Login icons the side panel'),
+      'disable' => t('Do not show the Social Login icons in the side panel'),
     ),
     '#default_value' => (empty($settings['side_panel_icons']) ? 'above' : $settings['side_panel_icons']),
   );
@@ -165,6 +165,8 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     '#description' => t('This is the title displayed above the social network icons.'),
   );
 
+
+  // Login page settings.
   $form['oneall_social_login_settings_login_page'] = array(
     '#type' => 'fieldset',
     '#title' => t('Login Page Settings'),
@@ -191,6 +193,8 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     '#description' => t('This is the title displayed above the social network icons.'),
   );
 
+
+  // Registration page settings.
   $form['oneall_social_login_settings_registration_page'] = array(
     '#type' => 'fieldset',
     '#title' => t('Registration Page Settings'),
@@ -217,18 +221,8 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     '#description' => t('This is the title displayed above the social network icons.'),
   );
 
-  $form['oneall_social_login_settings_registration_page']['registration_page_retrieve_avatars'] = array(
-  		'#type' => 'select',
-  		'#title' => t('For new users: Retrieve the user avatar from his social network account?'),
-  		'#description' => t('If a user registers for example with Facebook, Social Login grabs his Facebook picture and uses it as avatar for the newly created account.'),
-	    '#options' => array(
-	      'enable' => t('Yes, retrieve the user picture from the social network an use it as avatar for the user (Default)'),
-	      'disable' => t('No, do not retrieve the user picture from the social network'),
-	    ),
-   	 '#default_value' => (empty($settings['registration_page_retrieve_avatars']) ? 'enable' : $settings['registration_page_retrieve_avatars']),
-  );
 
-
+  // Edit profile page settings.
   $form['oneall_social_login_settings_profile_page'] = array(
     '#type' => 'fieldset',
     '#title' => t('Edit Profile Page Settings'),
@@ -255,6 +249,8 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     '#description' => t('This is the title displayed above the social network icons.'),
   );
 
+
+  // Block Settings.
   $form['oneall_social_login_settings_block'] = array(
     '#type' => 'fieldset',
     '#title' => t('Block Settings'),
@@ -270,6 +266,49 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
     ),
     '#default_value' => (empty($settings['block_icons_loggedin']) ? 'hide' : $settings['block_icons_loggedin']),
   );
+
+
+	// Account creation settings.
+  $form['oneall_social_login_settings_account_creation'] = array(
+  		'#type' => 'fieldset',
+  		'#title' => t('Account creation settings'),
+  );
+
+  $form['oneall_social_login_settings_account_creation']['registration_approval'] = array(
+  		'#type' => 'select',
+  		'#title' => t('Do user that register with Social Login have to be approved by an administrator?'),
+  		'#description' => t('Manual approval should not be required as Social Login eliminates SPAM issues almost entirely.'),
+  		'#options' => array(
+  				'inherit' => t('Use the system-wide setting from the Drupal account settings (Default)'),
+  				'disable' => t('Automatically approve users that register with Social Login'),
+  				'enable' => t(' Always require administrators to approve users that register with Social Login'),
+  		),
+  		'#default_value' => (empty($settings['registration_approval']) ? 'inherit' : $settings['registration_approval']),
+  );
+
+  $form['oneall_social_login_settings_account_creation']['registration_retrieve_avatars'] = array(
+  		'#type' => 'select',
+  		'#title' => t('Retrieve the user picture from the social network when a user registers with Social Login?'),
+  		'#description' => t('Social Login grabs the user picture from the social network, saves it locally and uses it as avatar for the new account.'),
+  		'#options' => array(
+  				'enable' => t('Yes, retrieve the user picture from the social network an use it as avatar for the user (Default)'),
+  				'disable' => t('No, do not retrieve the user picture from the social network'),
+  		),
+  		'#default_value' => (empty($settings['registration_retrieve_avatars']) ? 'enable' : $settings['registration_retrieve_avatars']),
+  );
+
+  $form['oneall_social_login_settings_account_creation']['registration_method'] = array(
+  		'#type' => 'select',
+  		'#title' => t('Automatically create a new user account when a user registers with Social Login?'),
+  		'#description' => t('If a user registers for example with Facebook, Social Login grabs his Facebook profile data and uses it to simply the user registration.'),
+  		'#options' => array(
+  				'manual' => t('Do not create new accounts automatically, just pre-populate the default registration form and let users complete the registration manually (Default)'),
+  				'auto_random_email' => t('Automatically create new user accounts and generate a bogus email address if the social network provides no email address'),
+  				'auto_manual_email' => t('Automatically create new user accounts BUT fall back to the default registration form when the social network provides no email address')
+  		),
+  		'#default_value' => (empty($settings['registration_method']) ? 'manual' : $settings['registration_method']),
+  );
+
 
   // Enable the social networks/identity providers.
   $form['oneall_social_login_providers'] = array(
@@ -326,6 +365,7 @@ function oneall_social_login_admin_settings ($form, &$form_state) {
 
   return $form;
 }
+
 
 /**
  * Callback handler to autodected the API connection handler.
@@ -400,6 +440,7 @@ function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$
   }
   // All fields has been filled out.
   else {
+
     // Wrapper for full domains.
     if (preg_match("/([a-z0-9\-]+)\.api\.oneall\.com/i", $api_subdomain, $matches)) {
       $api_subdomain = trim($matches[1]);
@@ -414,10 +455,7 @@ function oneall_social_login_admin_ajax_check_api_connection_settings ($form, &$
 
       // Build API Settings.
       $api_domain = $protocol . '://' . $api_subdomain . '.api.oneall.com/tools/ping.json';
-      $api_options = array(
-        'api_key' => $api_key,
-        'api_secret' => $api_secret,
-      );
+      $api_options = array('api_key' => $api_key, 'api_secret' => $api_secret);
 
       // Send request.
       $result = oneall_social_login_core_do_api_request($handler, $api_domain, $api_options);

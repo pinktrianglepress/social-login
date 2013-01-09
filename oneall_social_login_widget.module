@@ -18,15 +18,12 @@ function oneall_social_login_widget_add_js_library ($subdomain, $https_enabled =
 function oneall_social_login_widget_add_js_plugin ($plugin_type, $subdomain, $providers, $containerid, $token = NULL) {
   GLOBAL $is_https, $base_url;
 
-  // Build the callback uri.
-  $callback_uri = url('oneall_social_login/callback', array(
-    'absolute' => TRUE,
-  	'query' => array(
-  		'origin' => check_plain($base_url.request_uri())
-  	)
-  ));
-
+  // Check required settings.
   if (!empty($containerid) AND !empty($subdomain)) {
+
+  	// Build the callback uri.
+  	$callback_uri = url('oneall_social_login/callback', array('absolute' => TRUE, 'query' => array('origin' => check_plain($base_url.request_uri()))));
+
     // Add social library.
     oneall_social_login_widget_add_js_library($subdomain, $is_https);
 
@@ -83,9 +80,7 @@ function oneall_social_login_widget_block_view ($delta = '') {
 
       // Setup Block.
       $block['subject'] = t('Login with your Social Network account.');
-      $block['content'] = theme('oneall_social_login_widget_provider_container_block', array(
-        'containerid' => $containerid,
-      ));
+      $block['content'] = theme('oneall_social_login_widget_provider_container_block', array('containerid' => $containerid));
     }
   }
   return $block;
@@ -309,7 +304,10 @@ function oneall_social_login_widget_get_settings () {
 
   $settings['registration_page_icons'] = 'below';
   $settings['registration_page_caption'] = '';
-  $settings['registration_page_retrieve_avatars'] = 'enable';
+
+  $settings['registration_retrieve_avatars'] = 'enable';
+  $settings['registration_approval'] = 'inherit';
+  $settings['registration_method'] = 'manual';
 
   $settings['login_page_icons'] = 'above';
   $settings['login_page_caption'] = '';
