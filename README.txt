@@ -68,5 +68,3 @@ networks and identity providers:
 - Odnoklassniki
 - Mail.ru
 - Vk.com
-
-
