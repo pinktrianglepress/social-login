@@ -15,7 +15,7 @@ function oneall_social_login_widget_add_js_library ($subdomain, $https_enabled =
 /**
  * Adds the social network buttons.
  */
-function oneall_social_login_widget_add_js_plugin ($plugin_type, $subdomain, $providers, $containerid, $token = NULL) {
+function oneall_social_login_widget_add_js_plugin ($plugin_type, $subdomain, $providers, $containerid, $token = NULL, $type) {
   GLOBAL $is_https, $base_url;
 
   // Check required settings.
@@ -27,14 +27,25 @@ function oneall_social_login_widget_add_js_plugin ($plugin_type, $subdomain, $pr
     // Add social library.
     oneall_social_login_widget_add_js_library($subdomain, $is_https);
 
-    // Build Javascript.
+  // Build Javascript.
+  if($type == 1){
     $js = "oneall.api.plugins." . $plugin_type . ".build(\"" . $containerid . "\", {
-           'providers' : ['" . implode("','", $providers) . "'],
-           'callback_uri': '" . $callback_uri . "',
-           'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
-           'user_token': '" . (!empty($token) ? $token : '') . "',
-           'css_theme_uri' : '" . (($is_https ? 'https://secure.' : ' http://public.') . 'oneallcdn.com/css/api/socialize/themes/drupal/default.css') . "'
-           }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal -->";
+  'providers' : ['" . implode("','", $providers) . "'],
+  'callback_uri': '" . $callback_uri . "',
+  'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
+  'user_token': '" . (!empty($token) ? $token : '') . "',
+  'css_theme_uri' : '".$base_url."/sites/all/themes/dailyxtra/css/dx_social.css',
+  'grid_size_x': '1',
+  }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal -->";
+  }else{
+    $js = "oneall.api.plugins." . $plugin_type . ".build(\"" . $containerid . "\", {
+  'providers' : ['" . implode("','", $providers) . "'],
+  'callback_uri': '" . $callback_uri . "',
+  'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
+  'user_token': '" . (!empty($token) ? $token : '') . "',
+  'modal':true
+  }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal -->";
+  }
 
     // Add login buttons.
     drupal_add_js($js, array(
@@ -76,7 +87,7 @@ function oneall_social_login_widget_block_view ($delta = '') {
       $containerid = 'oneall_social_login_providers_' . rand(99999, 9999999);
 
       // Add Javascript.
-      oneall_social_login_widget_add_js_plugin('social_login', $settings['api_subdomain'], $settings['enabled_providers'], $containerid);
+      oneall_social_login_widget_add_js_plugin('social_login', $settings['api_subdomain'], $settings['enabled_providers'], $containerid, null, 2);
 
       // Setup Block.
       $block['subject'] = t('Login with your Social Network account.');
@@ -229,7 +240,7 @@ function oneall_social_login_widget_show_providers (&$form, &$form_state, $targe
     $containerid = 'oneall_social_login_providers_' . rand(99999, 9999999);
 
     // Add javascript to display the plugin.
-    oneall_social_login_widget_add_js_plugin($plugin_type, $settings['api_subdomain'], $settings['enabled_providers'], $containerid, $token);
+    oneall_social_login_widget_add_js_plugin($plugin_type, $settings['api_subdomain'], $settings['enabled_providers'], $containerid, $token, 1);
 
     // Show in fieldset.
     if ($widget_in_fieldset) {
