@@ -34,7 +34,7 @@ function oneall_social_login_widget_add_js_plugin ($plugin_type, $subdomain, $pr
   'callback_uri': '" . $callback_uri . "',
   'force_reauth' : " . ($plugin_type == 'social_link' ? 'true' : 'false') . ",
   'user_token': '" . (!empty($token) ? $token : '') . "',
-  'css_theme_uri' : 'https://oneallcdn.com/css/api/socialize/themes/buildin/signin/large-v1.css',
+  'css_theme_uri' : '".$base_url."/sites/all/themes/dailyxtra/css/dx_social.css',
   'grid_size_x': '1',
   }); <!-- oneall.com / " . ucwords(str_replace("_", " ", $plugin_type)) . " for Drupal -->";
   }else{
